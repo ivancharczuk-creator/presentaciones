@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MercadoLibre.com — Presentación Ejecutiva</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#E8F0FC;
+    --surface:#FFFFFF;
+    --surface-2:#EEF4FD;
+    --border:#CFE0F7;
+    --navy:#1F4C8C;
+    --navy-deep:#153969;
+    --text:#173A66;
+    --text-dim:#3E5E8C;
+    --text-faint:#6E86AC;
+    --mla:#2F6FBF;
+    --mlb:#2E9E76;
+    --mlm:#E8952E;
+    --gold:#FFCB3D;
+    --danger:#E2604F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; height:100%; overflow:hidden;}
+  body{
+    background: var(--bg);
+    color:var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    position:relative;
+  }
+  body::before{
+    content:""; position:fixed; top:-140px; right:-140px; width:340px; height:340px;
+    background:var(--navy); border-radius:50%; z-index:0; opacity:0.9;
+  }
+  body::after{
+    content:""; position:fixed; bottom:-160px; left:-160px; width:320px; height:320px;
+    background:var(--navy); border-radius:50%; z-index:0; opacity:0.9;
+  }
+  .deck{
+    display:flex;
+    height:100vh;
+    width:100%;
+    will-change:transform;
+    transition: transform .55s cubic-bezier(.65,0,.35,1);
+    position:relative; z-index:1;
+  }
+  section.slide{
+    flex:none;
+    width:100vw;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:64px 8vw 56px;
+    position:relative;
+    overflow:hidden;
+  }
+  .slide-inner{max-width:1180px; margin:0 auto; width:100%; transform-origin:center center;}
+
+  /* Arrow nav buttons */
+  .arrownav{
+    position:fixed; top:50%; transform:translateY(-50%); z-index:60;
+    width:46px; height:46px; border-radius:50%;
+    background:rgba(255,255,255,0.9); border:1px solid var(--border);
+    box-shadow:0 4px 14px rgba(31,76,140,0.12);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--navy); cursor:pointer; backdrop-filter:blur(4px);
+    transition:background .15s, color .15s, transform .15s;
+    user-select:none; font-size:20px;
+  }
+  .arrownav:hover{background:var(--navy); color:#fff; transform:translateY(-50%) scale(1.06);}
+  .arrownav.prev{left:18px;}
+  .arrownav.next{right:18px;}
+  .arrownav.disabled{opacity:0.3; pointer-events:none;}
+  @media (max-width:760px){ .arrownav{width:38px; height:38px;} }
+
+  .progressbar{
+    position:fixed; top:0; left:0; height:4px; background:var(--navy); z-index:70;
+    transition:width .55s cubic-bezier(.65,0,.35,1);
+  }
+  .slidecount{
+    position:fixed; bottom:22px; right:26px; z-index:60; font-size:12px; color:var(--text-faint);
+    font-variant-numeric:tabular-nums; letter-spacing:.04em; background:rgba(255,255,255,0.85);
+    padding:4px 10px; border-radius:20px; border:1px solid var(--border);
+  }
+  .kicker{
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--navy);
+    font-weight:800; margin-bottom:14px; display:flex; align-items:center; gap:10px;
+    background:#fff; border:1px solid var(--border); border-radius:20px; padding:6px 14px 6px 12px; width:fit-content;
+  }
+  .kicker .num{color:var(--text-faint); font-weight:700;}
+  h1.hero{
+    font-size:clamp(34px,5.2vw,60px); line-height:1.05; font-weight:900; letter-spacing:-0.01em;
+    margin:0 0 18px; color:var(--navy); text-transform:uppercase;
+  }
+  h2.slide-title{
+    font-size:clamp(24px,3.2vw,36px); font-weight:900; letter-spacing:-0.01em; margin:0 0 14px; line-height:1.15;
+    color:var(--navy);
+  }
+  .lede{font-size:17px; color:var(--text-dim); max-width:680px; line-height:1.6; margin:0 0 8px;}
+  .insight{
+    font-size:clamp(18px,2vw,23px); font-weight:700; line-height:1.45; color:var(--navy);
+    background:#fff; border-left:5px solid var(--gold); border-radius:0 12px 12px 0;
+    padding:16px 20px; margin:20px 0 24px; max-width:820px; box-shadow:0 4px 14px rgba(31,76,140,0.08);
+  }
+  .insight b{color:var(--mlm);}
+
+  /* Cover */
+  .cover-meta{display:flex; gap:26px; margin-top:36px; flex-wrap:wrap;}
+  .cover-meta div{font-size:12px; color:var(--text-faint);}
+  .cover-meta b{display:block; color:var(--text-dim); font-size:12px; margin-bottom:4px; font-weight:600;}
+  .cover-scroll{
+    position:absolute; bottom:34px; left:8vw; font-size:12px; color:var(--text-faint);
+    display:flex; align-items:center; gap:8px;
+  }
+  .cover-scroll .arrow{animation:bounce 1.8s infinite; display:inline-block;}
+  @keyframes bounce{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
+
+  /* Bullets */
+  .bullets{list-style:none; margin:18px 0 0; padding:0; display:grid; gap:14px; max-width:760px;}
+  .bullets li{
+    display:flex; gap:14px; align-items:flex-start; font-size:16px; color:var(--text-dim); line-height:1.5;
+  }
+  .bullets li .b-num{
+    flex:none; width:28px; height:28px; border-radius:50%; background:var(--navy); border:none;
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#fff;
+  }
+
+  /* KPI grid */
+  .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:10px;}
+  @media (max-width:900px){ .kpis{grid-template-columns:repeat(2,1fr);} }
+  .kpi{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:20px 18px; position:relative; overflow:hidden; box-shadow:0 4px 14px rgba(31,76,140,0.08);
+  }
+  .kpi::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--accent,var(--navy));}
+  .kpi .label{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); margin-bottom:10px; font-weight:700;}
+  .kpi .value{font-size:27px; font-weight:900; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; color:var(--navy);}
+  .kpi .foot{font-size:12.5px; color:var(--text-dim); margin-top:6px;}
+
+  /* Panels / charts */
+  .panel{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:22px 22px 14px; margin-top:8px; box-shadow:0 4px 18px rgba(31,76,140,0.08);
+  }
+  .legend-row{display:flex; gap:18px; margin-bottom:12px; flex-wrap:wrap;}
+  .legend-item{display:flex; align-items:center; gap:7px; font-size:12px; color:var(--text-dim);}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .chart-box{position:relative; height:280px;}
+  .chart-box.short{height:220px;}
+  .grid-2{display:grid; grid-template-columns:1.3fr 1fr; gap:16px; align-items:stretch;}
+  @media (max-width:960px){ .grid-2{grid-template-columns:1fr;} }
+
+  /* Spike table */
+  table.spikes{width:100%; border-collapse:collapse; font-size:13px;}
+  table.spikes th{
+    text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--text-faint); font-weight:700; padding:0 8px 8px; border-bottom:2px solid var(--border);
+  }
+  table.spikes td{padding:9px 8px; border-bottom:1px solid var(--border); color:var(--text-dim);}
+  table.spikes tr:last-child td{border-bottom:none;}
+  .tag{font-size:10.5px; padding:3px 8px; border-radius:20px; font-weight:700;}
+  .tag.sticky{background:rgba(46,158,118,0.15); color:var(--mlb);}
+  .tag.revert{background:rgba(226,96,79,0.15); color:var(--danger);}
+  .country-tag{font-weight:800; font-size:12px;}
+
+  /* Feature table */
+  table.feat{width:100%; border-collapse:collapse; font-size:13px;}
+  table.feat th{text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-faint); font-weight:700; padding:0 8px 8px; border-bottom:2px solid var(--border);}
+  table.feat td{padding:9px 8px; border-bottom:1px solid var(--border); color:var(--text-dim);}
+  table.feat tr:last-child td{border-bottom:none;}
+  .bar-cell{display:flex; align-items:center; gap:8px;}
+  .bar-track{flex:1; height:6px; background:var(--surface-2); border-radius:4px; overflow:hidden; min-width:50px;}
+  .bar-fill{height:100%; border-radius:4px;}
+
+  /* Recommendation cards */
+  .rec-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:20px;}
+  @media (max-width:960px){ .rec-grid{grid-template-columns:1fr;} }
+  .rec-card{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px; box-shadow:0 4px 14px rgba(31,76,140,0.08);}
+  .rec-card .q{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); margin-bottom:10px; font-weight:700;}
+  .rec-card .a{font-size:14.5px; color:var(--navy); line-height:1.55; font-weight:800; margin-bottom:8px;}
+  .rec-card .d{font-size:13px; color:var(--text-dim); line-height:1.5;}
+
+  /* Nav dots */
+  .navdots{
+    position:fixed; left:50%; bottom:22px; transform:translateX(-50%);
+    display:flex; flex-direction:row; gap:10px; z-index:60;
+    background:rgba(255,255,255,0.85); padding:8px 12px; border-radius:20px; border:1px solid var(--border);
+  }
+  .navdots a{
+    width:8px; height:8px; border-radius:50%; background:var(--border); display:block; cursor:pointer;
+    transition:background .2s, transform .2s; border:1px solid transparent;
+  }
+  .navdots a:hover{background:var(--text-faint);}
+  .navdots a.active{background:var(--navy); transform:scale(1.3);}
+  @media (max-width:760px){ .navdots{bottom:14px;} }
+
+  .slide-foot{
+    position:absolute; bottom:24px; left:8vw; right:8vw; display:flex; justify-content:space-between;
+    font-size:11px; color:var(--text-faint); letter-spacing:.04em;
+  }
+
+  footer.end{
+    text-align:center; padding:60px 8vw 80px; color:var(--text-faint); font-size:12px; line-height:1.7;
+  }
+
+  /* ---- Fused dashboard controls ---- */
+  .dash-controls{
+    display:flex; gap:14px; flex-wrap:wrap; align-items:center;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:10px;
+    padding:12px 14px; margin-bottom:14px;
+  }
+  .ctrl-group{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .ctrl-label{font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); font-weight:700; margin-right:2px;}
+  .chip{
+    display:flex; align-items:center; gap:6px; padding:5px 11px; border-radius:20px;
+    border:1px solid var(--border); background:#fff; cursor:pointer;
+    font-size:12px; color:var(--text-dim); font-weight:700; transition:all .15s; user-select:none;
+  }
+  .chip .dot{width:8px;height:8px;border-radius:50%;}
+  .chip.active{color:currentColor; border-color:currentColor;}
+  .chip.off{opacity:0.4;}
+  .date-range{display:flex; align-items:center; gap:8px; flex:1; min-width:220px;}
+  .date-range input[type=range]{
+    -webkit-appearance:none; appearance:none; width:100%; height:4px; background:var(--border);
+    border-radius:4px; outline:none;
+  }
+  .date-range input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:var(--navy);
+    cursor:pointer; border:2px solid #fff;
+  }
+  .date-label{font-size:11px; color:var(--text-faint); white-space:nowrap; font-variant-numeric:tabular-nums;}
+  .reset-btn{
+    font-size:11px; color:var(--text-faint); background:#fff; border:1px solid var(--border);
+    border-radius:20px; padding:5px 12px; cursor:pointer; font-weight:700;
+  }
+  .reset-btn:hover{color:var(--navy); border-color:var(--navy);}
+  .empty-msg{display:none; text-align:center; padding:30px 20px; color:var(--text-faint); font-size:13px;}
+  table.feat th{cursor:pointer; user-select:none;}
+  table.feat th:hover{color:var(--navy);}
+  table.feat th .arrow{font-size:10px; margin-left:3px; opacity:0.8;}
+
+  /* Logo */
+  .ml-logo{height:40px; width:auto; display:block;}
+  .ml-logo-corner{
+    position:fixed; top:20px; left:22px; z-index:55; height:30px; width:auto;
+    opacity:0.92;
+  }
+  @media (max-width:760px){ .ml-logo-corner{height:22px;} }
+  .cover-logo{height:64px; width:auto; margin-bottom:22px;}
+</style>
+</head>
+<body>
+
+<img class="ml-logo-corner" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAABTCAYAAAAlfjrVAAA73ElEQVR4nO2dd3wb9fnH319J3nuck9iJ4zh7KHuKAAkjgyQQ9kpp2av9BVpmW6CsUkpZZZSVsgph7xECgYSAspeVvbfjyHvbGt/fH9+TI8snecQhA31eLzMk3el7p7vPPePzPI+YeMtUwggjjDCOB5iO9gLCCCOMMFqKMGGFEUYYxw3ChBVGGGEcNwgTVhhhhHHcIExYYYQRxnEDy9FeQBhhhHHswWHXzMAo4HLgTAn7BZxttTnLj+a6jjvCcti1CCAOSAHSgHT936lAMhAPxACREsy+7QTUS6gVUA1UAMX6X6H+V6S/XmO1OeUvdkBhhHGMwWHX4oH/k3CTgExACHWvHHUc04TlsGvRQAaQC/SS0BvogaSrEKS6PTLRbBIxHi8WECYhJCahzq4QEuG3LykBKfBK8EoAAUiX2YQLqBSCYgkFwHaHXdsKrAO2APuBsjCJhfFrgMOumSX8WcDt4hjkh2NqQbr11BkYKJU5OgRJL6CjxytizSZJTKSbhDg3ibFutOQ60hJdpCbVkxxfT0Ksej06ykOE2YvZrDjG4xG4PCbcHkF1rYXyKgvlVRGUVEREFJZFRRSXR8QWlUdmlFRE9Kmus5zqcgsAl9lECbAbwWqHXVsCrAC2HW2zOIwwjiBSBEzjGOMGH476onQrKhcYJ+E0AcOkJFNKImOj3GSk1JHTqYY+2RXkZlaR06mKDqm1JMe7SIh1EWGRmM1ehKmVBpAUeLwCt9tEbZ2ZsqoIisoi2euMYeveeDbviY/Yti8uY19hTEZZVcRwl1tcBbLEYhab8uzaAgHzgDVWm7PwCJyWMMI4WjBxDPBCMByVhTnsmgnoCpwuYRqS0R4v6TGRXlOH1Fr651QwrE8JA7uXkZtZRWpiHdHRHoTQSUnqzp4/R3lbm/CUmIXEHOEhKsJDUkI92Z0qGdJHvevxmCiriORAURTrdiaxanOyafWWpLSt++JsFdURNgQzhWBDnl2bK+ALYLXV5qw+rBMTRhhhhMQvSli6NTUUuERKpni85MREek25mVWM7FfCSdZCBvUoIzO9BkuER20khSImCcj2VGGIxv+rx7h8MAtJamIdqcm19OtexgXj91JeGcGWvfEsWZ/KT3npsau3JA4rrYwc5pHyJrNZLHLYtdnAN1abs6AdF/qrhsOuiWM1fqhn0iL0/3VbbU53O+7bwqH70wN4rDant732/0tBN04i9f897HMkfoniZ4ddiwXGS7jS45HjzCaR1imtBtuAYiaMLGBEn2K01DrMZu8hggoklKMJCfisO931rKmxsHFXIvNXaXy7LIP1OxOpqTe5zCbWC8HbwDtWm3P3UVtzCOixwlzAikpmpAmI1rOopcAuwAFs8rca9QdOV6APkIXKykYC9cBBYAewEchvy82lr6snMFyq7+go1P4rgX1AHrAUONBWEnPYNQFo+jH0AboASYBZQpmAJ4K5+fq2XYAxqAdvV1R2GqAKlaBZBywCNlhtztpWrMsC9ALGAoNQ2bk4fV31Asok7BOwFhVL3dzK/UcDfYHBqN8+SUKlgO2AXd+f22HXMoAF+rnxxxJgQnPxW79zNBIYAXSVkCTUcdQIyOfQOVrbmmOAI0xY+kkaJ+FGJGeYTDK2X9dyptoOMGn0AXIzq5Ql1WBFiWOKp4LjEHlJKSgpi+JnRxqf/5TJwrxUiisivRYzm4FXgbesNue+o7laH/Sn3VjgBgmnCOiAsZXtBUokLBPwMvA9cCrwOwkjkGhCEAEBiVhJjRDsBr4FXrHanHktXJdP83O9hNMFdMRPknLoC6gXgu3Am8CrVpszv8UHr76nt4TfIjlLCLqjCKHhGHRCGGe1ObcabJsNXAtcAPQguHciURKAhcCLwDyrzelqZl09gFslnKv/JqFcCa+UFArBD8C/gUWhyFs/t+OA3wMno+RA/vv3SsgX8BHwKFCnr73VhOWwa90kXCvUOepGM+dIws8CXkKdoxYR1xEhLJ1lhwG3uD1yaoSFpKE9S7lw/D4mjjqAllqrrpLjiqQMEGB51dVZWLkpmXfndeHb5RkUlkV6zSYcQvA08L7V5qw8WkvVrZebpeRuIchoxaaVqCdif5TGraXYCdwH/C+UteWwa8nALagbKq2F+/airILbrDbnkuY+rB/7DOBuFNkYXnHBCMth105H3cxDg20bBGUo0nrEanOWBllbP+C/KMJuFfT13ma1Od8Jsu8I4GbgrzR/biXwA3CPvuYBAe8HJSz9QTgNeAh1nbTmHFUCbwAPtCSU0u6EpZuU10m4AUnWgG5l/GbiHqbY8klNrv0FrCmdQASHyKTJR4RfwL6dFuEjL5PE7TKzeksyr3/dlW+WZlBWFeEym/lawN+BpUcjJuOwazehbrrWkM7hogi4wWpzfhBkTekS/ingN7QtnroF+J3V5rQH+4B+M/0f8CDNHLsRYTns2jkSnhPKBW4LPBJeFXBr4APLYddiJbwh4Pw27hvUg+E8q825KvANh127BniS1v3mP6Fc3S4BrxsSlm6c/A54jJY/cAIhgU+Bm5qzmtst6K4v/FQJf/N4OLlTWq3pt5N2c+kZu+mo1YBXgMd0iB/ak6z8yEJKQX29mZLyCA6WRFNUHklljQWPR2A2S5LjXaQl1tExrY7EONeh4L73MBcm9H94BBazl+H9irB2L+Oc1en855PciMXrU8+WiBECnnLYtZeCPXGPBPSn+O38smQFkCYlf3XYtaWB8Tw9XHCvgN9i4AJJSTWCMgFuIBFIMPhcT+AJh127KES8cDLKwmj1sTvs2hDgsRBkVSklB4XAIyVJQpBGU1fWLNQNvQX4Z8B7pwiYGGTfbikpFoJqCVFCuXLRBp/LAS4BGhGWw671063p1h63rZWfP03Cw8KYrCRQ1YJzJIDpEgoddu0PodzDdiEsPah+o4Q/RZq9nU4b4eQPF2xlcK8ShECRwZGwqHxEZZbU1FhYtyOJhWvSWbEphW37Yikqj6S2HurdJqRUCvhIi5fEWDcZKW56ZFUxvG8JI/oU06NzJQnx9X4ZyTau14+4oiI8nDHqAEN7lzL7uy68/HlOp/yi6IcsZsY47NpfrDbn+vY8HSFwKerCDoQbWCNhlVAxhVQBQ1BB36DXhpTUAxuEYKOEaqGqEQaiRL+NzpoQDATOA54K2M104EqaklAl8JEQzEYF8T2om2GChOsNyGOUhJkOu3Z7oOvpsGvJUim2W/3k16/pO1GkGAi3hE8F/EcItgAuIdCASSjXNtA6sUjJ9Q679qnV5tzk9/p4jIl0I/C4ENhRgfEYlCt7Dcr1CrzhbQ67Fu9vwUmYIQS5Rsfm9/ut1xMtXVG/eRqtaIigW8j3COhk8B3VCN4V8JoQ7ESdoxTgdOAmmsbIQHIZgvnAW8G+87AJy2HXOkl4GMnlHi+R/bqX84cLtjKwZ6kSc8r2Zin8LCqoqTXzc146b3+bzU+OVEoqzMTFRJKRnkSfHsmkpyaSnBhLZEQE9S4XhcUVHCgsZX9BMRt3V/PxwgxSEjxYc8uZOOogZwwroFtWFcLsPTyi9SOu1KQ6bjp/K7YBRTz0ep+IRevSpgtBD4ddux0lgzhiLqIeIzrT4C23hH8LeGSgX1bMYdfSUdbYHzG4PqSkWggeAV4AigfanF49VtIX5fJOCdhESJjosGsv+J6c+nf8gYCbVd/334DnAp6yW4ElDru2DhWkDSSgi4HXUVlEf5whgsSG9BtqmVDblKEycaWoulKAUwyOBdTVN0vAHQHuUT6Q57Brm4BZgWvUyWMCsEk/BxESBgZeWrpber3V5vwx4K1NDru2mkPZTX+kA7EosldhGclZQa7bIv33ex0oGmhzSt3aPUlK/iEEww23MsZ0AScZvF6rf8e/An7HfGC9w64tkpJXhGCQ/0ZCECvhWodd+yZYpvawCEt3NZ4RyNO0tCSqqutYvTWBax4dysi+JZwyuJBRfYvJyqghKkqXX/hcr9YQgX9wW9AgLdi8K5HnP+rO5z93pLI2gr7dO/HbCwYxdkRfunXpQGpKAtGREZjNJoQQSCnxeLxUVtdS4Cxly879LFm1mUUrN7Fi8wEW5iUz64uunH1SPtNOyqd31wq17lbHvBqvVUpBeUUkpZURJMW5AQ8uNwMsZvPrQvAXh117rT01PAHIlJJuoumy1wj4Z+CFYbU5Cx127RFUNrGpeyD4DpX6r/bbxoW6We+RMLTJE1fSCxXo97lt41AB7Ma7FnxOU7Lyx2cSJgtlafgtiSzgbPwIy2HXTBLOEgZulIR8IbgL+MgoEaJve5Ewtn5WAg+GyJZ9qf9dYfDeGIdde063BM1CxYXKUEkEAJOAxcDPQfYNyio2gv8v3E/PggbCi7J0n/S3RvXzPc9h12ZKeK8l8To9/na+MOaQOcBTwX5Hq8253GHXHpCSN4UgNuAghqGuD8O4Z5sJy2HXhkvJf4Dhk04dym3XTsdZXMbX81eycNkGPv0pjo9+7EBnrZ5B3cs5aWARI/oU0y2zivhYl7JgQhJB45ve4zFRXWOhpCKS0ooINu1J4D8f5+LYHkevbp24+uLTOWv8MDqkJyMM7k4AIQQWi5nkxDiSE+Po3T2LKacNp6ikglXrtvPZt0v5YfFanno/mre/68KoviWMH+pkVP8iumRUEx3lQZj8vA5/6zEgwO92mSksjWTL3gR+dqTx4+p01u6Io84VQeeOKQzqm8PSNVsynMUV/7KYRZLDrv27ufR3G9FJCBIDX5SQNzBIVsZqc5bm2bXFwoCwBPwcQtG/QSidUCPC0uMWGcBuh10TEiYaEIkb+CBU/ELXCX0oJZcFXujAeIdd8yfSVCRDDZ4vbp2o3wj2PUAHobRWRpgdSqair/EjVKG+PyxAOUpXVmu1OWsddu1+AqQhgda2br0mAQMk/F5AvxDr9qEfxmS7GXgjRNZ2kdCD3y34jhxobCFBg/TkrRZkxL9DsAwll/FHvISzaE/C0snqFZNJDrpoylj+fPOFpKcmAl0YO7If+/KLWLZmC/MXr2XJmi3MWVrCF4vSSUv00LNzFYN6lDGsdwn9upXTKa2W2Bi3Eo36H7hXUFkdwZ6CGNZsS2blphQ27Y5nX2E01bVmqmoFkigumTqSP15zDt2yO7TlUBBCkJ6ayJknD2b8GCuOjbv49NslfPtTHnOWRvPl4nS0pHp6Z1fTL6eCXl0q6ZxRTVpiPdFRHiy6tVdbb6KsKoKC4mh25MexYWciG3fHs/NAFDV1ZhLiYhjcrzOTxg1lwsmDyemcwZwFK7nvyXeS8g+WPCAEZodde/IIkFYKh9TYh44bakKeFygJ8lZpiM3qMWhDIiURfsHfJCSDDYikFkh22LVTCB5H8QLJCMqgCWH1RIktfRm+TAxiK/r774c4BlAaos4GrxehRJXN4UuURCAQbn9C1smpgaAcdi3eYddyUYTTR0K2Hh/sCuQEsfiaQEJ3o0e2hJ8E7Am2nVW5h3Ol5BohGtTpwdBHKAFuIwjBfpSwNSSsNme53lAgkLBANrW+fWg1YenZh/+YTHLQjOnj+fPvLyAx/tC1YzaZyM7SyM7SOGfCKPYXFLNy7XZ+Wr6e5XnbWLuziEXrkoiwdCE1oZ7czFp6Z1eS06mK1MR6LGZJeVUEO/NjWb8zgU27Y3GWRSKEmdjoKOrq63B7IDEuij/8bgrXXjqBmOjmzm3LYLGYGTIgl4H9crjusoksWrGR+YvXsnLdDlZtLeUnRx1SeoiO9BIdCZEWNxaLwO2WeLyKROtcJrxeQYTFQkZaPCMGdWTkoJ6cMrI//XtnkxAX02ABTjltOFGREdz16Jux+QdL7hOCGj+Xob1goX3THa1emxCYOBQoThcCo6dLrJQ83cL9GWXLUmhMWBrBA9rN6X260ZQQAZyEuOF90N37Fnf0cNi1LOBCqWJCA1AVBOa2/GgOuyYEhucXAetaEC/dgnooNafVy8aYP/ajzlNLsBE94OP/ohCGCSII8oVB4bBrnVA+8PCLpoxtQlZNdm4xN5DXtDNHUFJayZYd+1mWt5XV63ewaft+1u4sZcmGerxev+JmQAgzcTFRZGemMWFcNwb3y+Xn5Rv4fN5yUhJjuef/LuTiqWOxWJoIohsgpaS2zoWzqIya2npioiPR0pKaJTizyURmh1TOP8vGORNGUVhSzo7dBWzasZ9tO/PZV1BMWUUVFVW1eD1eTGYT0ZERJCfGkZGeRHamRq9umfTI6UTHjBTiYqIM3VQhBGeePBiPx8tdj74Rm+8su89iFvkEMYdPECRgTAYmAzevNYhGBZ99SApiJRS0IF6YirGVV4wqwWk3OOzaJJTgcohoPkPnu0FCcZkZpeAPhAfY24IllaGC980RVrDMawlKLd8SFOvrCuShoJZkiwlLzyTc5/F6zpwwdgh/vvnCkGQVCLPJRHpqIumpiYwZ1ge320NhSTl79heye5+TfQXFVFTWUFtXT3RUJF0y0+mZ04me3TJJTozj7U9/5Hu7g8T4WB6+7TKmTxqN2WT8+0op2bO/kC++X84Pixxs311AXb2L2JgoemR35JwJI5l46lCSE41+14ATZDHTUUuho5bCmGF9GgL3LrcHl9uNV3UDxGIxE2ExExlhCRpDC4aJpw6hrKKKv/7r7bSqmrpHHXZtp9XmXN6qnRw/MHNkiu79i2yBJqVDPnhasK8YoxcluEQbLMxg0N3fl2gqg/CHG0UiO4HlUjI6MLsWACFV8L4RpMQjROgwgO/7hKC+uQ/JIBagBE8rrn63lHgNbpegxN2aC+cKKblyQM+u3DvzYj1m1Xb4E8GIQUZSFwUpJR99vYiHn1Vhh/tvvTgkWVVW1/LR14t48e25bNm5HyEgJTGBuNgoyitq+M6ex4Kl6zh17lJuveZshg/s0SqC8QXuLRYzMc26+S3f5/mTbezce5B/v/ZlroQHHXbtNydor61qKakzOOW1gF3qqfnWQieS9io2N75hJXGIdtMuxku4WxiTVSWqyNuOSmJsRrmiZULwJgbBbv9VGpGq7pZHtWBpFimJbO6WEKrVuNHr8aiHUktisfFCNK0ZJYSF1qKT77BrA6XkzoS46Mg7bzyPHjlGscwjg28WrOK+p96hrt7NvTMv4oIpJwUlqx27C3jilU/55NuleL1eRg/uxXmTxzDc2p3E+FjKK6uxr9jIB18v4jt7Huu37uGWq8/m4qlj2y0O1laYzSauv3wS6zbv4ZuFeRMsZq5D6ZpONJQJFTQPdDmqUK15l2JQ+NxCtMR6agkO6PtqtA4hGuYHNNexIBrVeSHwOOqALXpiZahRJlLXYd0JfByYjdU7OoQkHT1LabQ+C41d5mBIw9gl89CYCA9gEH9C/a6JqAdQc+iM8W8dNAbWLGHpArdbvNKTe+nZJzN+jLUF62gfLFi8lr/86y3KKqq5/brpXHHeeEOyklKyeOUm7nvqHVat2063Lh244fKJnDdpTBO3b0Dvrkw9fQSvvjeP1z74nnsef5ttO/OZedW0w7YaDwdCCJIT47j16rPJ27jTdLC4/CaHXZt7ArqGRSj3JtCsTgKy9KDwkdKktRQ7UFZOkv+LUpIhBL3190NhqK5niufQsVgkrBZKL+ZCWUlJgRsKeN5qcwZTevtmHDSCbrE2kLVOekYILGg2Qg8hGlrm+KOKxr/LZv21QHLrhEpaHAz1JXoXiSFB3t4YbLuWWFinezzyvL7du3DVRWeEDHK3J9Zs2MGfH3uLA84SbpoxmWsvnWD43XX1Lj74ys5jL37MgcISpp0+gtuunU7fnp2DunqZHVK588bz6N8rm78//wEvvTOXXfuc3Dvz4l/UejTC4P7dmDH9VJ6Y9XmWFNzksGvXHyF91lGBrj9aQlP1vQUY57BrHzfTLkUA56K6AvgHoXehNFLtca62obKNw/xf1JMC0/QHSahY1ulG4kuhgt6VqIV3MogzVQtBqO4TfWiq70IIivBzpYW64b00jQXZHHYtw2pzGpKJPoBispEYVMJe0dhV24R68ASSYBowFUIeB/pxGKnkPcD8YBuFzEo47Fq0hGsiLCRdcf44srOayC6OCLxeyesffM/mHfu49OyT+eO15xi6bPsLinno3+/xl8feoryyjluvOpsn7rmKfr26NBuXsljMTJ84ihcfvpFRg3rx9YKV3HTPiyxbs+VIHVaLIITgoqlj6dUtE49Hno1qgnai4WuUpdUIUtUcBhNs+nAyKlP9AKoDw4PAAxIGtRex67HDr43ek5ILUDWAhtCrPy4zeMsLzA9FdEIQheoFZrTfWKkEnUbZuXUBgtvVUmIU/xwUZG0+jENytuHaAiQRVpuzQMLcIPuZ4bBrQdvl6C7zzRjXt+5BtRw3RHNp1KEejxzXJ7cLZ40f1sxH2w8Sict1KBxx4GAJNbX1eLxe6updFBaX88k3S7jmzmd5cfZcMtKTeOzu3/Cna6e3KPPnjyEDcnn2ges4b+Jo1mzYwc33vsQX85bh8R69brTZWRrnTRqN2STSgMt1q+JEwjJU+UYjCMiSkucddu08h11r5J877Fqyw65dAbxCQKBaSg4KmN3Oa5yNsiAar1GVGD3lsGuTdBW6b31mvbvDUxgV9ioXal7DfowlBmbgKodd6+a33wiHXesn4WkklxtsU0tTi2QzgsUGn7UAf3XYtVscdq2Tvm+Lfm4vAJ4N0iutCNV2phEEzJaqE2wgcoDnHHbt9IBzJBx2LUvCw8BVBtshVSPBtUbv+Q4gKCScL4Q3bfL4oXTUUkJ9tF1hNpm44vzxODbt5s2P5/PdT2vo2S2T1KR4amrr2b2/kG27D+D1epl0yhD+dN05DOyT02o5gQ/ZWRqP3v1bOmWkMOu9efzpoVfZX1DMby84jajIJiLxXwRnjR/G6x/+QP7Bkkm6kK65uMlxA6vN6XLYtadQLkGO/3t6yv51IC/Prm0SUCkhHolVCAZg1GJF8D9UjV97rnG9w649C/yDpvfJAOB/wMI8u7ZBKDemJ6qUyUgh70F1YPX/DVegiCDQYhoHfJZn15YJNfy3k1Aarc4IQ5mGHdUR1n/ttQ679jpwGk1jTGlS8qgQXC9hs55R7IJy0Qz1TxLmC1hj8NYKoR4gf6Vp8HwY8K6Enx12bSNQIyFLwGihCuWNYktrBfwnlBUalLAcdq0DktPTU5I4Y2yoLOqRwYhBPXnl0Zv58Gs7C5asY8PWvVRWKas3Pi6a0UN6ccHkMUweP6xVerBgSE6M484bzyezQyqPv/wpDz7zPvsLirnl6rNbbbW1B3I6Z2Ab2pv3vlrcxWLGxglEWNBQAHsf8ARNb9p4wOarZRQN/2gKCQuEKsY+EibxixL6C9XPKnAFaShl+vTmdiLhE6E6OPhjjU4Egc37TMAAXfEeUiEqVWvjx4L0VvtKwjsioFAcQBfU9hHGlmDgd+zTz2+TrJ9eyvMUaj8XGSw3TU8ynN3CY7nLqD21P0JZWEM8XpnTOzeT7l2PTiC6R04n7rjhPG78zWQOFpZRUqbiiilJ8XTMSCE+1qhCo+2IiY7k6kvOJCMtmQefeY8X3p5DUUkFd998AZkdjBInRw4Wi5mxI/ry8dxFEV4pxhGiR9CxAqtqNdNSlTOoYzJLeNAoSN0MJKon+E1Hqme+1easdNi1O3Qx5AyMG+iFggf4XMAfA0lFt4L+geojFlyIGBx7BNwBfBNk7bUOu3avVINRz6UVfa78UCTgnlAdXa02Z6nDrt2KCshfRhtEwVKyXQj+aLU5v2zus6EO4iQhvEnW3l2Ji2mJ3uzIQAhBYnwsPXI6MWJQT0YM6kmPnE7tTlY+mE0mzpkwkmfvv5YBPbvy7pc/M/P+V9i07ZefIzG4Xy7pKUkgGaz3tToW0NyFv4QWyhKsNqcHeE3A+RI+RCm6m4OUsE+q1r+Xh2iCKDB+qLcqzW21OQsFzET9raVlWi+JCh7fD1wbrBuqLlm5BnXOWqohKwM+QXUZfTdURtVqc+YLNXDkUSlDywwC4NbX9FuUex4Selvjm1E91DbSumOZLQTnWm3OT1uyQUgLyyTMfDV/JbV1LkYM7MGA3l3p1CGlUQHviQghBGOG9eG5B6/nr4+/xYIl67j5nhd58E+XMWZYs1b0YcFX/3jgYAlrN+3CbDaDKjTNJHSnhGAolRJHgKLYgnGw1B8HURdfIPk06cYQgP8BGVIyHUjQFda1BOkOod9wSxx2bQZqNNQUYDjQRUIsqtNDHWrM1XahrKo5qKxVqBujQkp26t/vg5mWF+b6r7EaeMlh1+aguopORskqUjkk5KyTkjIh2IYKgn8CbGzOVbXanD867Nq5qEkz01DWVoq+Vp/UoQzYKWG5fuzLQ7T4Cdx/ocOu3YPgfVQWdhyq+0MK+v2vl8fUAE4J64TqNvFVS4ZC+H1PJfCMw659ipI1nIlyFTUOnSMPSnS7BxXE/xI146DFo76CDqFw2LUNIPtI6cXlVt0HUpNjye3SgX49uzCkfzesvXPI7qwFLe49EbC/oJhHnvuA97/+mawO6dx/6yVMHj8sqNq+Laird1HgLGX9lj2scGxj9YYdbN9dwMGiMtxuLyYTtcBUq805r9mdBUBPIRsFU2tD9SzSWwQbBQcrm7vAHGrwQ6L+58PBll6Y+ppTUEW8vrmHpUBZS6UL+vqNlN3lh9tPX898pdO4I0QNKoje4uM02G80SniZhjr3bpS+qggoaut+A74jHiWd8CnSQQlZi1Hq9cL2kIcEOUf1qGNxtqBfliGCEtaqhemF6UmutJkXbqO4PII1W5PZvj+W/KIIaurMmM0m0lPiye3SgVGDezFycE+sfbqipSW16818LKC0vIqnZn3GrPfmERcTzR03TOfy6ae2OYMopaSiqoZtOw+wLG8Li1dtZu3m3eQfLKG2zo0QkuR4LzkdqymrimCvM9YDzLAGGecURhi/FgR1Cc0mkRAf42bKmHyyOlRRU2PBWRrNtn1xOLYlsXpLMht2VbF6fQmLVm0hLiaSnM4ZDB/YnTNOGsTg/t1Cdv88nuDLIGakJ/PkK5/xwNPv4Swq4+bfTmlxLM1HUus27ebn5Rv4cel6Nu/Ip6S8Gq/XS2Ksl55ZNQzsXsaw3qUMyC2ja8dqnvmgB89/kmu2mOUvPfEmjDCOOYSM6Jt8/amkICbKQ3bHKrI7VTJ+eAFul5mC4mg27ExgyfpUlqxPZePuGl7fspd3v/iZ7tkdOXPsICacMpgBvbse9eLiw0VMdCTXXTqBDmlJPPjMezz96pc4i8u568bzQ9Yg1tTWs3HrXr5flMeCxUqeUVpRg9ksyUqvZ/jwSsYMKGJorxJ6Z1eSlFDfqPuq5dB/n1hmqx/0PmunoWrQioHXDAp/I1DTf7rSuCSnFHg9WI91vWatNyou1hmwW23O+e1/FGH8EghJWPVuEx7/eX2Shj7mFrOXrIxqsjpUcfrIAiqrIti6N56Fa9JZsDodx/Y6nnp1L29+vADbsN5cNOUkbMP7NNFM+fpL+QZFHMuwWMycN3kM6amJ/Pmxt3jjo/kcLCzjodsub1S25PF62ZdfxPzFa5kzfyUr1+2gqLSSCIuka4daJo0s5ZTBhQzqUUrXjtVNB3R4TKqrkQC354TlKaChJ9Q/UYRiRgX6P6Rp+5II4Hqa9pnfiepDbjSROF3CH3VJQhaK9B8iRK1aGMc2QhJWbb2ZymqzunmajOvSCcwrEEKSEOtiSJ9ihvQp5sopO1m7PZG5Szsyb4XGlz9U8L3dgW1ob6686HROGdWfunoX3//s4Kfl6ykurSQ7M53xY6yMHtqbqMgIPF4vVdW11Ne7iYuNJjoq4hcjtLWbduFyeRjUrxumgFZoQghOHT2A5x+6jnv+9TZfL1hJaXkVf79jBt27dmL1uu189t0y5tnz2LWvGCHcdO1Qx6QRxYwb4mRE3xI6pNaqAa6+IRzeAFLy8ZZXUFh2fFumoaDX3b1ICwSMOlosDtX7Tf1TBBnUGsbxiVCE5a6qsUQWlETTL5Q8xl+G7BWAIq8xAwsZPaCIa6bFMmdJR96dl8W8RXksy9vKtDOGU1pezdyFK5FSEBUZRXVtNW998iO/u+A0TrNZ+eqHFaxYu43qmnrSUuIZOagn0yeMpldu5hEnrh+XrmfWu99xx/XTOX+yzbBLxKC+3Xj6vmu478nZzPlxFdf/+QW6ZqazYu02isuqSU9yM2V0CWeOLOAkaxGZ6TWNScp/CnYQ1Neb2F/YECM7YTo2QKMR8kdKJzIWycWIMFmdSAhFWJV1LlPslr0JjB9eYNyqyxA+80BZXlkZ1Vx99jamnbSfTxZmMeuLrrz16Y8IAaeNHsgV54+nQ3oy67fu4eXZ3/L8/77mjY9+oKS8ipTEOOLjYjjgLOWn5Rv4cM5iHrj1UiaNCzpUo11w2TmnsHXnfu59YjZFpZVcffEZhhnBbtkdeOKeq0h/7n3e/eJntuzcT7dOdVw5eT9njT5Azy4VxMS4jUmquXMpoLg8Sics6aJlosrjCfFSMqyVz57WkE98Cya/hHGcIShhCcFBj1dkrNqchNtl1oO/rbi6fJaXvllGai3XTd9KSkI9M58ewHBrL56496qGouohA3Lp1S2Ta+96jpraemb+bipTzxiOlppEcWkFc+av5MW353Lvk7MpKq2gqroWt8dLz5xODOmfS1pKQrtZXsmJcdw78xJMJhP/fOFjSkormXn1NMOMYHpqIn+79VKiIiP57/vzGdTdyW2XblbWlFe0jqR8kIBJsnlPPAdLojCbcIFhu5DjGSZhXMwbDF7AgYpz+TeryxfGLXWPXruNMI4YghKWhO1CyAHrdiRSUBxNVka13wS1VsCfuMySkopIPF4zU08f3qQDxJD+uZwxdhBD+udyydknN+i5Mjuk0rdnF4RJ8PjLn3Hbw6/jleqajYyIoG+Pztw0YzJTTx/ebg0GkxPj+OsfLgLghbe/oaS8MmhGMDE+lusuncA8ex5rtlUdOl+INo65VzHDJetTqay1YDZTRvOjqU5o6LVxtxBwzepXVkuGK4SEr4VPC8ZghXEUEdzCgjyziWnb8+PEsg0pZHWoUhZDW40YfbuqGjMgSEpoKqI2m03ccPkksjqmNRGfmk0mJp4yhDc/ms/APjmMGzMAk8nEirytzFmwitv//hoA0ycG7RvWavhIy+v18vanC6morOG+Wy4xLIROS00gPSWB3XsEVbWHT5rFZVH8uFoJtYWa9farJixoGKnebnDYtQ6oUpWh6MXXDru2D5WpXAJsbsFIsGD7jgdyUVKNLNSswUigAiXDCGox64r3XFRhdC6HWimXAduBPA71hv9VIVQMaxVQ5XKb4j/7KZOJow4QE+XhcGdydutUhdnk5qdlG5g+cXSj2JBXSrp37RjUtcvO0vjHnVcwemjvhpYvM6afyri5S7jr0Td5afY3jB3Rt1W92d1uDy63J2gW0uceArz92Y9UVNbw8O0zmkya3rbzALv3F5Ka6CE5/jCuIwmYJUs3pLJ+ZyJmxdsbacVgzhMRug7rSqkmIHugYdRUETCrNeU2ujV1MXAbqgtn4H3g1V3NT/Vp3CFbngTsu2EoKpK+en909ZSmwYX9AgMXXyeq0yVciWqvk0HTYm2PhIMCfnTYtReAn9pKqscjQgUxVwH5ZpNk0boUVm9JBpNsm1vogxSM7l/EgG6VfPnDKl586xsKi8upqa1n6858XnzrG4pKKoJunhgfy6RxjecJWixmzpkwitNsVtZv2cuWHftbtSTHxl1cf/fzLF65CSmND85HWpedfQrfL85j5v2vsGjFRsorqyktr2LB4rXc9+RsnMWVnDXmAFpKXdvPk5DU1Fh4b15naurNvuGyS45Qv6fjCRHAbwXcjWoY91f9v39P45rFkJCKAG4EXkA1mTN6aJv0djc3SckHDrsWqP1qAoddMzns2jkoTdjjAk7Vu3cGTt42/B0ddi1bwjOoHlbnC1VTaGSqm/X3LkYN3L0vsDvriYxQFtYeYLkQsmdxRSRvzOnK4J6lh2dlSeiYXsvdv9nEbc9F8o//fMJHcxajpSWya58qop8+ofUuncVipn+vbD6ft5yCwtYl07pkKrfr9/e9zMO3Xc7EU4eEtLSqquv4eO4Srrz9WXKzM3B7vGzdWUB1bTXnnOTkqik7Fcm0xX3WrasFqzNYsDoNs0kCoghY1Mo9nag4bNIWcJqUdBOi6cQaw88LBultmy+22pybQnx0BsbNCJuFT48mYGwrN00D7gI0h127I5ja/0RCUAtLNzPngHCbTTB3aQbfLe9wmFaWSu+PG3qQF29fxTlj91JTtZUNm1Zx4OAB6utdVNe0pv/bIdTU1uHxevhoziKef/NrFq3YSE1tswNsSU9N5KHbLierQyq3/f01Pvp6UdB+7smJcVxzyZmkJiVQWV3F7j0b2L9/EwNyDvDA1Zv5x40OMlJr205WJklxaTQvf5ZDZa3FZ12tBIL1fAqjdZDASCFo1TQVvW3zrfpcwCZw2LVxUrVSbgtZZaEsKyOykqjWPGX6n5HrZwGuBmbq2rYTGs11B5wPbBVC9qmqs/DMB90Z1KOM7I6HEYCXSp81vG8x1u5lFJZGUVVr5vmPuvPeD1EsWb251aO26updrNu8B69XMs+ex5wfVxEfG8uZY63cfv25ze7PFxu76Z4X+cu/3sbt8QQd2JoYH4vFYqJX50oe/30eSXEutJQ64uNcCF3539bMoJSC/32TzeL1qXrsSniBT1ra+yiMZuH/y7ilZB2CZQKKJWhCTezphcGDXErOFYJXgEZzIh12LVHCnbqb1hI07FsnwDtRdZSB33dQCN5FdRQtQLmHPSTMEHAGje9di5T8XggWAD+2cB3HJUISltXm3J1n1z4WiLtNAhzbk3jmgx48cM1a5RrKNtycfjKHqAiPSv8Lyfnj9vHV4g48/+YcenXLbDRCvrC4nMhIS9De7XX1LnKzO3DPHy4iN7sD+wuK+WLecj75dgn5B0t49oHryM7SqKt3UVFZQ2pyQpOSm369uvDIHTOY+cAs7n1iNm6Pt5G0AmggRGdxFeMHlTOwZ6ly2ySH6izbmpMwSeYvz+DFz7rh9QpMyh3cTJBxU2EcFmqBfwvBE74mdXogvgvwZ5TF0lg+oeJRkwkgLOBkJKcY/e5SUg9sEIKNqCJtj1ANBH0jzkZiPHZrjxDcCHwdELtc4rBrXwJPA1cYrO8Gh11bdCJnD5vtvyzgHWCGEGq00vs/ZNGzSyVXT9uO2Vdj2CaLQv+HfrOPGVDEVVN28cyHFm74ywucN3E0g/rlNJDPH343hTNPHmy4q4S4GO6ZebFSIuokd96kMdz/1Du8++XPvDx7Lg/edjnrN+/hvidnc9VFZzDtzBFNLKgxw/rwwK2XctvfX+OBp9+lrt7FeZPGEBMdSVFJBR98Zef5N+eQmlDHRaftVV0V2iIM9YcEzF4270rkkTd7U1Qe6YtdgWqBe0INnzhG8CFwv7/lquuvdjvs2l0SugrVWbQRpBpEGh0gr5imD1gNRJEQPAK8iWqK1yjOoBPk5TR1Iz2owRKG/c31HuqPSslYIchttD7J6fpkoVVBj/w4R0saxjsk/E/A3UJI6lwmnny3O53Sapg2dj9wGKTlgxRYzF5mXriFhFg3//2yK/9+/QvMpgg9nuRhen7wYLwQAnNAoDw9NZE/XnMOK9ft4JuFq7n20gn06dGZHjkduevRNykuq+CK88Y3EZpOPHUIRaUV/OWxt3jg6ff44Cs7yQlx7NpfyNZdB0lPquOuGZuxDSw8PF0aNMStDjhjeODVfuRtT8J0qDZzI6rdcBjtizLgpWButk4Is6TktMDSHgHdUQSzD9SsRFSXiUB4UfMJnwghRO2IgSuI0ll9GuoA9BFkc1CDVQ+tT1lZY/k1E5Y+yudlYBqIASaTpKQykr/9ty8xkR7OGFnAYZOWoKHn1g3nbuPMEQUsXKOx92AMNfVm3v8+k3c+/4mThvWld/dDw1X2FxRTV+dqoonyIbuzxtD+3fjk26Xs2FNAdpbGn2++kKrqOh565kNq61xN6gSFEEw7YwTvfv4TS9ZsZtNWJcFJTnBxzkllXDllByP7Fx+edQkNZHWwOJr7X+3HvBUaJgE677qBF1uj/wmjZZCSLUKQ18zHlqIGneYGvJ6K0kb5+uFnSkmXwKSy3kv+rWZU8z0xnmFYDHRqZuiIG9XO2KjCd5TDrj13ospgWjSSx2pz7nDYtSek5FkhRKzZJNlXGMOdLwzgYa+JiaPyVUarHUjLLCS9sivo1bUcpKCu3kyE2cvLX1i4/s//4aKpJzGkXzcKCst4afY3DOrbjUfu/I3hLs0mE/FxMUjpod6lEizpqYncd8slVFTW8MjzH+J2e7j+8omNSOtgYRlFpZXER0v+ceM6emRVkhTnIiujRvWu8orDJyuzlwPOGO5/tR+f/pSJEOhZQYGE7wS81sa9hxECQrCF5kW4hQj2QBOXK0YXgvrQCaN++YK1GE929kd3VM/6QAxCDWdoDsHu3W6ofvBt6pl+rKM1M8RmIzgZuBIEPtK664X+VFRbOPeUfapA+nBJy79RoISoSA+3XbqZ6EgP/5tbz/1P7ycuJoraOhcudz0Ws5nyymrDgHx5ZTWbd+wjPjaOThmH6hYzO6TywJ8u448P/pcnXvmM+noXF00dS2SkhR27C3hi1mds3VXAReMLmGrbb9xxoa3xKiHBLNm+J4F7Z/Xn+5Uqw+5HVvsEPHi4gxLCMIaE/IHNWx91GBebW2g8mzDJqCOEgPwWBL41jK+iaFo//9AfqSgi/HUTll58+iDQDxjlI62C4mj+8lI/9h6M4ZppO0iIcx1+xswHAXgFSfH13DljE2eNOcD8VRq7DsSSEOtmxaZk8jbu4vPvlnHZOac0EnxKKfn6hxWscGwnq2MaJmFCStnwmR45nbj7pvO58vZnefK/n/PeV3YiLBbyD5ZSW6dEoHfN2ERMtOfwA+vQQFZSwOK8dB58rS8rtyTrbqBOVmqk099DDa4M47DREqGfFAaaJ31kmP89E4HxFdG8AJAj0/pGSiKFaP0w0+MFrTow3TW8AzVcMQdU+r2yJoLH3+3J5j3x3HrxFuXOeWk/0tKD8kP6FDO4d4nScpm8LFyVwQ3/iuWR5z+krKKaqacNJzEhlvKKar74fjnPv/k1NXVuduxxcu3dz3PKyH4Mt3YnMSGW4tIKvvlxNVU1tXTWqkmLK6W23oytfy1TbPlMteUr8m2PwLqQYIKaWjMf/NCFx9/tQX5RNGaTL2YlALxCMAv472GesTAUgokoWzIV2GT0OX1+X3vV7QXrMFEEhFLUh4JZCHbSMlI+LtFqJtYHP94uJc+prIQSgnq9go8XZrJpdwL/d8FWJo85QFSkp32srQbtllBOE6r0xTawkL9dtYGH3+jN/U9/wKx3vyMlMY6S8iryD5aRkVLNXZfvZteBWOavrmbWe/v57/vziYwQ1LskQrgZ2rOCB65ZT+/sClxuE3Ex7kNxqnYiKylgy+4EnvmgB5//3Ik6lwmLuVG8VALvA/e2d0eCXzEMXTIBHRx2TTQTEI9FBdcbbyuoR3VbaA8cQD3WA4l1DapOsK3XQbu02zlW0VbT8UNde6LXTgmEUGd+/a4E/vSslfmrNK47ezt9u5UjGsSV7WBx+XYgwSwkF4zfQ+8uFbwzrwvLNyZTUWEhLc7NxMmlXDh+L4N7leDxmNi8O54Vm1LZsCuBimoLyfEuBvYo4+SBTjqm1zYuN/LqQarDdP8wSyoqI/nkxyxe/jyHzXvjMQl8olD/T38K3BqOW7UrKqWk3sA96oFq11IaYtvOuharESRUiPZr87MVRX6BNY0Z0DBJOYwAtImwdKnD/wCk5DFd/4EQikRq6i28831nFq1L5fIz93DRaXsUKYh2JC7dVRRCMrBnKf27l1FZFUFNnYmYKC/xca4GFbrF7KVfbjn9upchvQKvFJiE1IlUGAzYaCP8iKquzoLdkcZLn+WyMC8Nt0f4yRYavs8r4WMBM602Z377LCIMHfmowHNgNqYPqktDqCna4wxLbST7EO1GWNtQpDUs4PUcVKYw5JRvvd/WVFSnCl8SwQQss9qcJ6wOq83FkrrO400huE5Kth96R7e2BOwuiOUfb/XmsvtHMevzXA4URituMOlu3eH2dvRzFc1CkhRfT8f0WpLi65VOymcpoZOS14RAkaqKGpnaiaz04zF7qXOZWbgqg1ueHsT1jw3h+5XpeL0qQRGg13FL+K+Am6w25z7j/YZxGNgP7DZ4PQn4fTCdk9454UYM7g0hWNFeVrDV5iyUMNfgrXjgWp2QDKGr5K8AXkVNHXoZeFlKngQy22N9xyoOK5ugxwE+ddi1Ayj3cAw+GtGzX1IK1u9K4N5ZfXlrbhfOH7ePyaMO0DWzSpW2+GbxtYccAhqToOH+2tmaEurfZeVRLFqXxkfzs5i/Oo2yKlVicyhW1eh7y1A9k54Mm/5HBlabszTPrv2IsRJ9KvC8w649AWxGZfXigVGoWsIBgRvoGdzP23ONQsUtZ6BqGP2/61whKHLYtX8Bu/xFoA67lgH8DriDAPmDECwGFrbnGo81tEv602pzLnHYtUsl3IPkskO1VaLBTfQR18Y3+vDGnGzGDy1kyph8BvcsVZ0OTO1EXkcS/iRlkrhdZrbvj2P+qgy++Lkj63YkUFkboROVb2hHkwPZCPwF+OzX1CnyaEDAe1Iywxey8IMFuASYICU7EFQJVXKTg5EQFBCCH4AF7bzE1Sjr6D78mvXp2q4bgDOBRQ67tgNFqlkoUjXqkloJ/OdE74nVbnoNq82522HX/oDAjuoE2fPQu42Ja3dBLK9+1ZX3v8+kf7cKxg91cvKgQnpnVxwiL59QU9/+6EFfhEn92+0ys78whiXrU/l+hcbSDSnkF8Xg8YLZRFCi0p/QH6NEoW1NW4fROiwTgpdQ12Ng904BpAnRoh5We4C/t7c1rMeCnwH6ozKD/jCh7qGeTTZsColyD79oz/Udi2hXgZmekn/VYdeWSLhVwIU0yoII3VUEE15q6i0s2ZDC0o0pvPRZDj07VzGqXzHD+pTSL6ecDqm1REZ6EEK3iI8oifn5krqbB+DxmCiriGTXgVhWbk5hybpU1mxLZF9hDC63SQXvBcFcP1Ct6h1C8ATwQbi31S8Hq83pddi1xyVkCfgNbbve9wC3HCkxr15s/Sf9f8+n9Wt0A28DD/waJDFHRBGrV5PfBHwCzAROpkm5gdBvdJASyqoiWbIhkiUbUomJ9NAhtZaenasYkFtGn+wKcjOr6JhWS0Ksi+gor7LC/OEfPA8VzG9QrDf+kJQCj9tEVY2ForJIdhXEsmVvAo5tiWzaHc+egzGUVUXi8Qo/kvKf1diEqCSqnux1IXjZanMaBYDDOMLQCeEWlCt+I9CVFjztpKQawY96mdQRrTyw2pz7HHbtBmAZcD2qzrC5hJhXL7J+EXjhRHcFfThiEn69lupLh11bCJwFXAvYMKiT8mXPVKcXSb3bxO6CWHYeiOPb5RlEWLwkxLjQkuvJ0mrprNXQJaMaLaWOjqm1JMe7iItxEx3pJTrSg8UsMZukrndS8HoFHq+g3iWorrVQW2+irCqCwrIoDpZEs/dgDPucMex1RlNQEkVpRQTVdRa8UgDSN71Gt6QaVm506BLYK+F9AbOADeFZd4bwAjW6q+z/9Kki+CPH6PPNumlWm7PcYdceQ+ndpko4RUAvKUkVgiiUu1gHVKOyiyuE4CtgQTNuYK2UFAnRyN200Abhpk6sT/itcbyAvqjaQN996kZ1c9gM/CAEnwLbfk3Xl5h4y9Rf5Iv0yR5noEzzk2lF/2vfMBuvVJaQ/ioWM0SYvURGeIiN9hAV4SUqwovFLImO9DTah9sjcHtM1NSZqHebqK41U+8yUec24/EInZjUfv3avARKEULBjdLVfADMBjaeqC0+2gMOu2ZGxW4Cg9w1wNrA4mG9X3kf1Hy/Zj/fzHdHoIggDUhAEVYNSkxaBFS0hAT0azrH4C3n4erq9DWmo4qkY/SXa/T1Ff0a3D8j/GKE5YM+e20ocA7K8upBG6rTjSZyST9pl9H7DSREUyJq45R7KSVOBIuFcn/nhjVVYYRx5PCLE5YPuvgtAxiN6pV9kpTkBmk3eyzBIyVFCFYK+A74HuX2/SqfeGGE8UviqBGWP3RzX0MJ9k6WMEpAHynJEIIYjq6uwYNyFXZKWCXAjhpjvj1MUmGE8cvimOibo8d6CvS/ebrb2Elvsm+VKtbRU6iyA1+DskgOo7QoABJFTLUSyoSqpN8jYYOAdai5gDsElP2aApxhhHGs4ZiwsJqD7j7GoaywTkC2/tdZKhJLR5KMCqDG+zI/UmISApPex8jLoUxQFao8plDCQaF6dO9B1Z7t1//KTuRxSWGEcTzimLCwmoNu1VTqfztQblkYYYTxK8MJP9o6jDDCOHEQJqwwwgjjuEGYsMIII4zjBmHCCiOMMI4bhAkrjDDCOG7w/+/mOsefrCkWAAAAAElFTkSuQmCC" alt="MercadoLibre">
+<div class="progressbar" id="progressbar" style="width:14.28%"></div>
+<div class="arrownav prev disabled" id="btnPrev" aria-label="Anterior">‹</div>
+<div class="arrownav next" id="btnNext" aria-label="Siguiente">›</div>
+<nav class="navdots" id="navdots"></nav>
+<div class="slidecount" id="slidecount">1 / 7</div>
+
+<div class="deck" id="deck">
+
+<!-- SLIDE 0: COVER -->
+<section class="slide" id="s0" style="justify-content:center;">
+  <div class="slide-inner">
+    <img class="cover-logo" src="data:image/png;base64,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" alt="MercadoLibre">
+    <div class="kicker">Caso HBS 9-106-057 · Gestión de Operaciones y Producción</div>
+    <h1 class="hero">MercadoLibre.com<br>¿Vale la pena seguir regalando publicaciones?</h1>
+    <p class="lede">Análisis ejecutivo del caso y del dataset de la cátedra, para responder la consigna grupal: continuidad de los "Días D" y días gratuitos de publicación, y plan de acción a futuro.</p>
+    <div class="cover-meta">
+      <div><b>Período analizado</b>01 Nov 2004 – 30 Jun 2005</div>
+      <div><b>Mercados</b>Argentina (MLA) · Brasil (MLB) · México (MLM)</div>
+      <div><b>Base</b>55.603 publicaciones individuales</div>
+    </div>
+  </div>
+  <div class="cover-scroll">Avanzá para ver el análisis <span class="arrow">→</span></div>
+</section>
+
+<!-- SLIDE 1: CONTEXTO -->
+<section class="slide" id="s1">
+  <div class="slide-inner">
+    <div class="kicker"><span class="num">01</span> Contexto</div>
+    <h2 class="slide-title">La decisión que enfrenta el equipo</h2>
+    <p class="lede">A fines de 2005, el equipo debate si conviene suspender los <b style="color:var(--text)">"Días D"</b> y los días gratuitos de publicación, la promoción usada para amortiguar el rechazo a las tarifas introducidas en 2004-2005.</p>
+    <ul class="bullets">
+      <li><span class="b-num">1</span> Las tarifas siguieron el precedente de eBay, con temor a alienar vendedores frente a competidores gratuitos como DeRemate.</li>
+      <li><span class="b-num">2</span> Cayeron las publicaciones, pero la conversión mejoró (15% → 30%).</li>
+      <li><span class="b-num">3</span> Los "Días D" buscan reactivar el volumen sin resignar la estrategia de tarifas.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- SLIDE 2: KPIs -->
+<section class="slide" id="s2">
+  <div class="slide-inner">
+    <div class="kicker"><span class="num">02</span> Panorama general</div>
+    <h2 class="slide-title">Métricas clave</h2>
+    <div class="kpis" id="kpiRow"></div>
+  </div>
+</section>
+
+<!-- SLIDE 3: HALLAZGO 1 -->
+<section class="slide" id="s3">
+  <div class="slide-inner">
+    <div class="kicker"><span class="num">03</span> Hallazgo 1</div>
+    <h2 class="slide-title">Las tarifas filtraron el volumen — y México se llevó el ajuste más duro</h2>
+    <div class="insight" id="hallazgo1Insight">De los tres mercados, <b>México perdió el 77% de sus publicaciones activas</b> entre noviembre de 2004 y junio de 2005, tras la introducción de tarifas en enero de 2005 — muy por encima del ajuste en Argentina y Brasil.</div>
+    <div class="panel">
+      <div class="dash-controls">
+        <div class="ctrl-group">
+          <span class="ctrl-label">Países</span>
+          <div class="chip active" id="chipMLA" style="color:var(--mla)"><span class="dot" style="background:var(--mla)"></span>MLA</div>
+          <div class="chip active" id="chipMLB" style="color:var(--mlb)"><span class="dot" style="background:var(--mlb)"></span>MLB</div>
+          <div class="chip active" id="chipMLM" style="color:var(--mlm)"><span class="dot" style="background:var(--mlm)"></span>MLM</div>
+        </div>
+        <div class="ctrl-group date-range">
+          <span class="ctrl-label">Período</span>
+          <span class="date-label" id="dateFromLabel">01 Nov 2004</span>
+          <input type="range" id="rangeFrom" min="0" max="241" value="0">
+          <input type="range" id="rangeTo" min="0" max="241" value="241">
+          <span class="date-label" id="dateToLabel">30 Jun 2005</span>
+        </div>
+        <button class="reset-btn" id="resetBtn">Reiniciar</button>
+      </div>
+      <div class="chart-box"><canvas id="liveChart"></canvas></div>
+      <div class="empty-msg" id="liveEmpty">Activá al menos un país para ver el gráfico.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: HALLAZGO 2 -->
+<section class="slide" id="s4">
+  <div class="slide-inner">
+    <div class="kicker"><span class="num">04</span> Hallazgo 2</div>
+    <h2 class="slide-title">Los "Días D" generan picos reales — pero no siempre duraderos</h2>
+    <div class="insight">En Argentina y Brasil, los picos de publicaciones gratuitas <b>dejaron una base más alta</b> semanas después. En México, los mismos picos <b>se revirtieron</b> en 2-3 semanas y la caída estructural continuó.</div>
+    <div class="panel">
+      <table class="spikes">
+        <thead><tr><th>Fecha</th><th>Sitio</th><th>Publicaciones nuevas (antes → pico)</th><th>Efecto 3 semanas después</th></tr></thead>
+        <tbody>
+          <tr><td>14 ene 2005</td><td class="country-tag" style="color:var(--mla)">MLA</td><td>10.713 → 32.258</td><td><span class="tag sticky">Se mantiene alto</span></td></tr>
+          <tr><td>05 abr 2005</td><td class="country-tag" style="color:var(--mla)">MLA</td><td>9.463 → 30.204</td><td><span class="tag sticky">Se mantiene alto</span></td></tr>
+          <tr><td>19 feb 2005</td><td class="country-tag" style="color:var(--mlb)">MLB</td><td>29.768 → 78.928</td><td><span class="tag sticky">Se mantiene alto</span></td></tr>
+          <tr><td>14 abr 2005</td><td class="country-tag" style="color:var(--mlb)">MLB</td><td>27.247 → 92.270</td><td><span class="tag sticky">Se mantiene alto</span></td></tr>
+          <tr><td>04 mar 2005</td><td class="country-tag" style="color:var(--mlm)">MLM</td><td>2.697 → 25.393</td><td><span class="tag revert">Revierte y sigue cayendo</span></td></tr>
+          <tr><td>24 may 2005</td><td class="country-tag" style="color:var(--mlm)">MLM</td><td>2.975 → 28.721</td><td><span class="tag revert">Revierte y sigue cayendo</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5: HALLAZGO 3 -->
+<section class="slide" id="s5">
+  <div class="slide-inner">
+    <div class="kicker"><span class="num">05</span> Hallazgo 3</div>
+    <h2 class="slide-title">Lo que realmente mueve la conversión no es el volumen gratis</h2>
+    <div class="insight">El formato <b>subasta convierte más del doble</b> que precio fijo (94,3% vs. 42,0%), y features pagas como <b>foto + negrita elevan la conversión +35 puntos</b>. Ninguna promoción de publicación gratis logra un salto comparable.</div>
+    <div class="grid-2">
+      <div class="panel">
+        <div class="chart-box short"><canvas id="featChart"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="chart-box short"><canvas id="auctionChart"></canvas></div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:16px;">
+      <div class="section-desc" style="margin-bottom:8px;">Hacé clic en un encabezado para ordenar la tabla.</div>
+      <table class="feat">
+        <thead>
+          <tr>
+            <th data-sort="feature">Característica <span class="arrow"></span></th>
+            <th data-sort="without_pct">Sin la característica <span class="arrow"></span></th>
+            <th data-sort="with_pct">Con la característica <span class="arrow"></span></th>
+            <th data-sort="diff">Diferencia <span class="arrow"></span></th>
+          </tr>
+        </thead>
+        <tbody id="featTable"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: RECOMENDACIÓN -->
+<section class="slide" id="s6">
+  <div class="slide-inner">
+    <div class="kicker"><span class="num">06</span> Recomendación ejecutiva</div>
+    <h2 class="slide-title">Plan de acción — respondiendo la consigna (Parte II)</h2>
+    <div class="rec-grid">
+      <div class="rec-card">
+        <div class="q">¿Mantener la estrategia de tarifas?</div>
+        <div class="a">Sí, pero con estrategias diferenciadas.</div>
+        <div class="d">Mejoran calidad y conversión. Los "Días D" funcionan en AR/BR, pero en México no revierten la caída estructural.</div>
+      </div>
+      <div class="rec-card">
+        <div class="q">¿Qué datos pedir al equipo de TI?</div>
+        <div class="a">Trazabilidad de vendedor y fecha de promoción.</div>
+        <div class="d">Cruzar cada publicación con la fecha del "Día D" y si el vendedor es nuevo o recurrente.</div>
+      </div>
+      <div class="rec-card">
+        <div class="q">¿Qué cambios estratégicos hacer?</div>
+        <div class="a">Migrar de "publicación gratis" a "herramientas de venta".</div>
+        <div class="d">Incentivar subasta y bundles de foto/destacado. <b style="color:var(--navy)">Sumar más funcionalidades pagas en OFF</b>: casi la mitad ya usa alguna, con conversión notablemente mayor.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: CIERRE -->
+<section class="slide" id="s7" style="justify-content:center; align-items:center; text-align:center;">
+  <div class="slide-inner">
+    <div class="kicker" style="justify-content:center;">Fin del análisis</div>
+    <h2 class="slide-title">Gracias</h2>
+    <p class="lede" style="margin:0 auto; text-align:center;">Fuente: dataset de cátedra ("listings" y "asis-dataset0"), asociado al caso Harvard Business School "MercadoLibre.com" (9-106-057 / 107-S04). Uso exclusivamente académico.</p>
+  </div>
+</section>
+
+</div>
+
+<script>
+const LISTINGS = [{"date": "2004-11-01", "mla_live": 127362, "mla_paid": 10422, "mlb_live": 209555, "mlb_paid": 17012, "mlm_live": 105112, "mlm_paid": 7967}, {"date": "2004-11-02", "mla_live": 129566, "mla_paid": 8645, "mlb_live": 210434, "mlb_paid": 17043, "mlm_live": 106744, "mlm_paid": 6647}, {"date": "2004-11-03", "mla_live": 130649, "mla_paid": 7831, "mlb_live": 213194, "mlb_paid": 21578, "mlm_live": 107067, "mlm_paid": 7075}, {"date": "2004-11-04", "mla_live": 131570, "mla_paid": 8225, "mlb_live": 213043, "mlb_paid": 20539, "mlm_live": 107824, "mlm_paid": 6841}, {"date": "2004-11-05", "mla_live": 131492, "mla_paid": 7275, "mlb_live": 213293, "mlb_paid": 17266, "mlm_live": 107414, "mlm_paid": 6811}, {"date": "2004-11-06", "mla_live": 131819, "mla_paid": 5301, "mlb_live": 215163, "mlb_paid": 16455, "mlm_live": 106727, "mlm_paid": 4764}, {"date": "2004-11-07", "mla_live": 131819, "mla_paid": 5074, "mlb_live": 215162, "mlb_paid": 17538, "mlm_live": 106726, "mlm_paid": 5212}, {"date": "2004-11-08", "mla_live": 133779, "mla_paid": 7981, "mlb_live": 217868, "mlb_paid": 20618, "mlm_live": 108822, "mlm_paid": 8175}, {"date": "2004-11-09", "mla_live": 134522, "mla_paid": 7644, "mlb_live": 218039, "mlb_paid": 18798, "mlm_live": 110153, "mlm_paid": 6166}, {"date": "2004-11-10", "mla_live": 135003, "mla_paid": 7653, "mlb_live": 219422, "mlb_paid": 19858, "mlm_live": 109926, "mlm_paid": 6323}, {"date": "2004-11-11", "mla_live": 134694, "mla_paid": 7507, "mlb_live": 219637, "mlb_paid": 18080, "mlm_live": 104174, "mlm_paid": 7401}, {"date": "2004-11-12", "mla_live": 125203, "mla_paid": 7955, "mlb_live": 219883, "mlb_paid": 17607, "mlm_live": 106280, "mlm_paid": 8015}, {"date": "2004-11-13", "mla_live": 126083, "mla_paid": 5602, "mlb_live": 198420, "mlb_paid": 14584, "mlm_live": 107901, "mlm_paid": 5091}, {"date": "2004-11-14", "mla_live": 126108, "mla_paid": 5617, "mlb_live": 198402, "mlb_paid": 14906, "mlm_live": 107892, "mlm_paid": 4713}, {"date": "2004-11-15", "mla_live": 129066, "mla_paid": 8829, "mlb_live": 200932, "mlb_paid": 18506, "mlm_live": 110367, "mlm_paid": 8623}, {"date": "2004-11-16", "mla_live": 128503, "mla_paid": 6386, "mlb_live": 202660, "mlb_paid": 19093, "mlm_live": 111333, "mlm_paid": 6954}, {"date": "2004-11-17", "mla_live": 130175, "mla_paid": 8900, "mlb_live": 206711, "mlb_paid": 22280, "mlm_live": 112925, "mlm_paid": 8279}, {"date": "2004-11-18", "mla_live": 132097, "mla_paid": 9237, "mlb_live": 208438, "mlb_paid": 20631, "mlm_live": 113573, "mlm_paid": 6586}, {"date": "2004-11-19", "mla_live": 132815, "mla_paid": 7179, "mlb_live": 208638, "mlb_paid": 17308, "mlm_live": 114662, "mlm_paid": 6582}, {"date": "2004-11-20", "mla_live": 132882, "mla_paid": 5183, "mlb_live": 212344, "mlb_paid": 17772, "mlm_live": 115260, "mlm_paid": 4837}, {"date": "2004-11-21", "mla_live": 132870, "mla_paid": 4613, "mlb_live": 212342, "mlb_paid": 17488, "mlm_live": 115254, "mlm_paid": 5157}, {"date": "2004-11-22", "mla_live": 134610, "mla_paid": 8178, "mlb_live": 214776, "mlb_paid": 21677, "mlm_live": 116208, "mlm_paid": 7338}, {"date": "2004-11-23", "mla_live": 136689, "mla_paid": 8230, "mlb_live": 213637, "mlb_paid": 25577, "mlm_live": 116731, "mlm_paid": 6888}, {"date": "2004-11-24", "mla_live": 136988, "mla_paid": 7743, "mlb_live": 215206, "mlb_paid": 19142, "mlm_live": 117002, "mlm_paid": 7635}, {"date": "2004-11-25", "mla_live": 137464, "mla_paid": 7889, "mlb_live": 216165, "mlb_paid": 18896, "mlm_live": 117378, "mlm_paid": 6799}, {"date": "2004-11-26", "mla_live": 129333, "mla_paid": 7960, "mlb_live": 215108, "mlb_paid": 17117, "mlm_live": 108564, "mlm_paid": 7492}, {"date": "2004-11-27", "mla_live": 131542, "mla_paid": 9174, "mlb_live": 215106, "mlb_paid": 17022, "mlm_live": 109161, "mlm_paid": 6977}, {"date": "2004-11-28", "mla_live": 131561, "mla_paid": 4520, "mlb_live": 215108, "mlb_paid": 18046, "mlm_live": 109162, "mlm_paid": 4863}, {"date": "2004-11-29", "mla_live": 134136, "mla_paid": 9543, "mlb_live": 199957, "mlb_paid": 19266, "mlm_live": 113666, "mlm_paid": 10636}, {"date": "2004-11-30", "mla_live": 136256, "mla_paid": 8165, "mlb_live": 203256, "mlb_paid": 21853, "mlm_live": 114630, "mlm_paid": 6373}, {"date": "2004-12-01", "mla_live": 136458, "mla_paid": 7747, "mlb_live": 206236, "mlb_paid": 18802, "mlm_live": 114485, "mlm_paid": 6385}, {"date": "2004-12-02", "mla_live": 136469, "mla_paid": 8289, "mlb_live": 206073, "mlb_paid": 20221, "mlm_live": 114412, "mlm_paid": 7403}, {"date": "2004-12-03", "mla_live": 137298, "mla_paid": 7806, "mlb_live": 204266, "mlb_paid": 14321, "mlm_live": 114867, "mlm_paid": 7107}, {"date": "2004-12-04", "mla_live": 137292, "mla_paid": 6132, "mlb_live": 208397, "mlb_paid": 18604, "mlm_live": 114012, "mlm_paid": 4974}, {"date": "2004-12-05", "mla_live": 137283, "mla_paid": 4921, "mlb_live": 208403, "mlb_paid": 18000, "mlm_live": 114015, "mlm_paid": 5035}, {"date": "2004-12-06", "mla_live": 138959, "mla_paid": 8390, "mlb_live": 210662, "mlb_paid": 21276, "mlm_live": 116493, "mlm_paid": 8990}, {"date": "2004-12-07", "mla_live": 139119, "mla_paid": 6270, "mlb_live": 212508, "mlb_paid": 21197, "mlm_live": 117723, "mlm_paid": 6799}, {"date": "2004-12-08", "mla_live": 139813, "mla_paid": 6862, "mlb_live": 214205, "mlb_paid": 21313, "mlm_live": 118673, "mlm_paid": 7950}, {"date": "2004-12-09", "mla_live": 140717, "mla_paid": 7837, "mlb_live": 214755, "mlb_paid": 19004, "mlm_live": 118316, "mlm_paid": 6669}, {"date": "2004-12-10", "mla_live": 129827, "mla_paid": 7362, "mlb_live": 212422, "mlb_paid": 16423, "mlm_live": 119125, "mlm_paid": 6559}, {"date": "2004-12-11", "mla_live": 128606, "mla_paid": 5162, "mlb_live": 213827, "mlb_paid": 18458, "mlm_live": 117048, "mlm_paid": 4462}, {"date": "2004-12-12", "mla_live": 128604, "mla_paid": 4881, "mlb_live": 213819, "mlb_paid": 18948, "mlm_live": 117161, "mlm_paid": 4823}, {"date": "2004-12-13", "mla_live": 132216, "mla_paid": 10131, "mlb_live": 214366, "mlb_paid": 20108, "mlm_live": 119603, "mlm_paid": 9050}, {"date": "2004-12-14", "mla_live": 133701, "mla_paid": 8442, "mlb_live": 199643, "mlb_paid": 22539, "mlm_live": 114241, "mlm_paid": 7936}, {"date": "2004-12-15", "mla_live": 135080, "mla_paid": 8733, "mlb_live": 202088, "mlb_paid": 23161, "mlm_live": 116887, "mlm_paid": 9192}, {"date": "2004-12-16", "mla_live": 135585, "mla_paid": 7325, "mlb_live": 201220, "mlb_paid": 20360, "mlm_live": 117055, "mlm_paid": 7211}, {"date": "2004-12-17", "mla_live": 135064, "mla_paid": 6882, "mlb_live": 201057, "mlb_paid": 20588, "mlm_live": 116203, "mlm_paid": 7187}, {"date": "2004-12-18", "mla_live": 133102, "mla_paid": 4930, "mlb_live": 199593, "mlb_paid": 19235, "mlm_live": 115556, "mlm_paid": 5720}, {"date": "2004-12-19", "mla_live": 133112, "mla_paid": 4910, "mlb_live": 199596, "mlb_paid": 19222, "mlm_live": 115590, "mlm_paid": 4355}, {"date": "2004-12-20", "mla_live": 134171, "mla_paid": 7837, "mlb_live": 196828, "mlb_paid": 19881, "mlm_live": 116675, "mlm_paid": 8726}, {"date": "2004-12-21", "mla_live": 133559, "mla_paid": 6951, "mlb_live": 192557, "mlb_paid": 17617, "mlm_live": 117297, "mlm_paid": 7665}, {"date": "2004-12-22", "mla_live": 132349, "mla_paid": 6510, "mlb_live": 188363, "mlb_paid": 16543, "mlm_live": 116185, "mlm_paid": 6410}, {"date": "2004-12-23", "mla_live": 128696, "mla_paid": 5858, "mlb_live": 184212, "mlb_paid": 15011, "mlm_live": 114621, "mlm_paid": 5477}, {"date": "2004-12-24", "mla_live": 126885, "mla_paid": 3929, "mlb_live": 176444, "mlb_paid": 9009, "mlm_live": 111521, "mlm_paid": 5010}, {"date": "2004-12-25", "mla_live": 122810, "mla_paid": 3570, "mlb_live": 170275, "mlb_paid": 9766, "mlm_live": 109315, "mlm_paid": 3423}, {"date": "2004-12-26", "mla_live": 122815, "mla_paid": 4655, "mlb_live": 170278, "mlb_paid": 13318, "mlm_live": 109280, "mlm_paid": 4569}, {"date": "2004-12-27", "mla_live": 121963, "mla_paid": 8815, "mlb_live": 167820, "mlb_paid": 20877, "mlm_live": 112506, "mlm_paid": 11034}, {"date": "2004-12-28", "mla_live": 117688, "mla_paid": 8140, "mlb_live": 169718, "mlb_paid": 19180, "mlm_live": 108463, "mlm_paid": 8560}, {"date": "2004-12-29", "mla_live": 117977, "mla_paid": 8340, "mlb_live": 169808, "mlb_paid": 18117, "mlm_live": 108842, "mlm_paid": 8654}, {"date": "2004-12-30", "mla_live": 118151, "mla_paid": 6864, "mlb_live": 167339, "mlb_paid": 14756, "mlm_live": 109691, "mlm_paid": 7350}, {"date": "2004-12-31", "mla_live": 116313, "mla_paid": 3447, "mlb_live": 163094, "mlb_paid": 8360, "mlm_live": 108866, "mlm_paid": 4724}, {"date": "2005-01-01", "mla_live": 114041, "mla_paid": 3247, "mlb_live": 166092, "mlb_paid": 11000, "mlm_live": 107622, "mlm_paid": 3606}, {"date": "2005-01-02", "mla_live": 114042, "mla_paid": 4641, "mlb_live": 166097, "mlb_paid": 14944, "mlm_live": 107794, "mlm_paid": 5280}, {"date": "2005-01-03", "mla_live": 115320, "mla_paid": 7789, "mlb_live": 174077, "mlb_paid": 24404, "mlm_live": 111443, "mlm_paid": 10669}, {"date": "2005-01-04", "mla_live": 115098, "mla_paid": 7647, "mlb_live": 178262, "mlb_paid": 22212, "mlm_live": 113190, "mlm_paid": 8364}, {"date": "2005-01-05", "mla_live": 115045, "mla_paid": 7020, "mlb_live": 180506, "mlb_paid": 20336, "mlm_live": 114566, "mlm_paid": 8094}, {"date": "2005-01-06", "mla_live": 113609, "mla_paid": 5885, "mlb_live": 183011, "mlb_paid": 20801, "mlm_live": 113174, "mlm_paid": 6750}, {"date": "2005-01-07", "mla_live": 113919, "mla_paid": 5565, "mlb_live": 182170, "mlb_paid": 18135, "mlm_live": 114437, "mlm_paid": 7539}, {"date": "2005-01-08", "mla_live": 112992, "mla_paid": 4348, "mlb_live": 188977, "mlb_paid": 18123, "mlm_live": 111717, "mlm_paid": 5198}, {"date": "2005-01-09", "mla_live": 113001, "mla_paid": 4007, "mlb_live": 189015, "mlb_paid": 17532, "mlm_live": 111713, "mlm_paid": 5120}, {"date": "2005-01-10", "mla_live": 114412, "mla_paid": 7131, "mlb_live": 196163, "mlb_paid": 22574, "mlm_live": 112872, "mlm_paid": 7724}, {"date": "2005-01-11", "mla_live": 113128, "mla_paid": 6520, "mlb_live": 197087, "mlb_paid": 20255, "mlm_live": 112718, "mlm_paid": 8034}, {"date": "2005-01-12", "mla_live": 110868, "mla_paid": 7952, "mlb_live": 201324, "mlb_paid": 21784, "mlm_live": 113050, "mlm_paid": 8140}, {"date": "2005-01-13", "mla_live": 114071, "mla_paid": 10713, "mlb_live": 199354, "mlb_paid": 20480, "mlm_live": 112222, "mlm_paid": 8399}, {"date": "2005-01-14", "mla_live": 138052, "mla_paid": 32258, "mlb_live": 199565, "mlb_paid": 19066, "mlm_live": 110499, "mlm_paid": 9159}, {"date": "2005-01-15", "mla_live": 134419, "mla_paid": 4306, "mlb_live": 199824, "mlb_paid": 17187, "mlm_live": 115464, "mlm_paid": 8653}, {"date": "2005-01-16", "mla_live": 134427, "mla_paid": 3524, "mlb_live": 199842, "mlb_paid": 17343, "mlm_live": 115471, "mlm_paid": 14860}, {"date": "2005-01-17", "mla_live": 136751, "mla_paid": 8058, "mlb_live": 203704, "mlb_paid": 23626, "mlm_live": 112487, "mlm_paid": 6423}, {"date": "2005-01-18", "mla_live": 135694, "mla_paid": 6454, "mlb_live": 204787, "mlb_paid": 20009, "mlm_live": 110881, "mlm_paid": 3896}, {"date": "2005-01-19", "mla_live": 134835, "mla_paid": 7173, "mlb_live": 206994, "mlb_paid": 21365, "mlm_live": 107853, "mlm_paid": 3560}, {"date": "2005-01-20", "mla_live": 134916, "mla_paid": 6467, "mlb_live": 210192, "mlb_paid": 21241, "mlm_live": 104823, "mlm_paid": 3487}, {"date": "2005-01-21", "mla_live": 133373, "mla_paid": 6118, "mlb_live": 210174, "mlb_paid": 18864, "mlm_live": 101538, "mlm_paid": 3391}, {"date": "2005-01-22", "mla_live": 133182, "mla_paid": 4540, "mlb_live": 214401, "mlb_paid": 18332, "mlm_live": 98519, "mlm_paid": 2394}, {"date": "2005-01-23", "mla_live": 133182, "mla_paid": 3611, "mlb_live": 214415, "mlb_paid": 17528, "mlm_live": 98547, "mlm_paid": 2128}, {"date": "2005-01-24", "mla_live": 135055, "mla_paid": 7426, "mlb_live": 217394, "mlb_paid": 20978, "mlm_live": 97673, "mlm_paid": 3529}, {"date": "2005-01-25", "mla_live": 136299, "mla_paid": 8034, "mlb_live": 219197, "mlb_paid": 19345, "mlm_live": 95738, "mlm_paid": 3565}, {"date": "2005-01-26", "mla_live": 134144, "mla_paid": 7214, "mlb_live": 220329, "mlb_paid": 20729, "mlm_live": 92904, "mlm_paid": 4347}, {"date": "2005-01-27", "mla_live": 134164, "mla_paid": 7330, "mlb_live": 220373, "mlb_paid": 21659, "mlm_live": 89340, "mlm_paid": 3718}, {"date": "2005-01-28", "mla_live": 131550, "mla_paid": 7181, "mlb_live": 221562, "mlb_paid": 19874, "mlm_live": 84173, "mlm_paid": 3160}, {"date": "2005-01-29", "mla_live": 132531, "mla_paid": 5644, "mlb_live": 226669, "mlb_paid": 22246, "mlm_live": 79355, "mlm_paid": 2314}, {"date": "2005-01-30", "mla_live": 132545, "mla_paid": 4810, "mlb_live": 226680, "mlb_paid": 18136, "mlm_live": 79365, "mlm_paid": 2463}, {"date": "2005-01-31", "mla_live": 134823, "mla_paid": 8061, "mlb_live": 225279, "mlb_paid": 21780, "mlm_live": 78989, "mlm_paid": 4141}, {"date": "2005-02-01", "mla_live": 136975, "mla_paid": 8307, "mlb_live": 225536, "mlb_paid": 21543, "mlm_live": 78306, "mlm_paid": 3429}, {"date": "2005-02-02", "mla_live": 135901, "mla_paid": 8201, "mlb_live": 224114, "mlb_paid": 21258, "mlm_live": 75889, "mlm_paid": 3459}, {"date": "2005-02-03", "mla_live": 137202, "mla_paid": 7950, "mlb_live": 221783, "mlb_paid": 19413, "mlm_live": 74084, "mlm_paid": 3714}, {"date": "2005-02-04", "mla_live": 136268, "mla_paid": 6977, "mlb_live": 211699, "mlb_paid": 17511, "mlm_live": 71795, "mlm_paid": 3097}, {"date": "2005-02-05", "mla_live": 136372, "mla_paid": 4941, "mlb_live": 208163, "mlb_paid": 13021, "mlm_live": 67063, "mlm_paid": 2563}, {"date": "2005-02-06", "mla_live": 136378, "mla_paid": 4113, "mlb_live": 208161, "mlb_paid": 14106, "mlm_live": 67074, "mlm_paid": 1956}, {"date": "2005-02-07", "mla_live": 138707, "mla_paid": 8561, "mlb_live": 205567, "mlb_paid": 13411, "mlm_live": 65615, "mlm_paid": 3635}, {"date": "2005-02-08", "mla_live": 139518, "mla_paid": 7529, "mlb_live": 203071, "mlb_paid": 15264, "mlm_live": 63866, "mlm_paid": 3425}, {"date": "2005-02-09", "mla_live": 140396, "mla_paid": 7982, "mlb_live": 207695, "mlb_paid": 23022, "mlm_live": 59999, "mlm_paid": 3552}, {"date": "2005-02-10", "mla_live": 140150, "mla_paid": 7205, "mlb_live": 211704, "mlb_paid": 24024, "mlm_live": 57737, "mlm_paid": 3371}, {"date": "2005-02-11", "mla_live": 137635, "mla_paid": 6911, "mlb_live": 214441, "mlb_paid": 21212, "mlm_live": 55085, "mlm_paid": 3212}, {"date": "2005-02-12", "mla_live": 123338, "mla_paid": 5449, "mlb_live": 218655, "mlb_paid": 19772, "mlm_live": 47965, "mlm_paid": 2238}, {"date": "2005-02-13", "mla_live": 123336, "mla_paid": 6717, "mlb_live": 218665, "mlb_paid": 17726, "mlm_live": 47968, "mlm_paid": 2121}, {"date": "2005-02-14", "mla_live": 127082, "mla_paid": 10043, "mlb_live": 223649, "mlb_paid": 23203, "mlm_live": 44159, "mlm_paid": 3363}, {"date": "2005-02-15", "mla_live": 128142, "mla_paid": 7933, "mlb_live": 227828, "mlb_paid": 21301, "mlm_live": 35363, "mlm_paid": 3780}, {"date": "2005-02-16", "mla_live": 128289, "mla_paid": 8521, "mlb_live": 225474, "mlb_paid": 20838, "mlm_live": 34757, "mlm_paid": 3426}, {"date": "2005-02-17", "mla_live": 129501, "mla_paid": 8130, "mlb_live": 223117, "mlb_paid": 19452, "mlm_live": 33086, "mlm_paid": 3092}, {"date": "2005-02-18", "mla_live": 128995, "mla_paid": 7100, "mlb_live": 233530, "mlb_paid": 29768, "mlm_live": 33316, "mlm_paid": 3900}, {"date": "2005-02-19", "mla_live": 130797, "mla_paid": 5820, "mlb_live": 286755, "mlb_paid": 78928, "mlm_live": 30979, "mlm_paid": 2255}, {"date": "2005-02-20", "mla_live": 130820, "mla_paid": 5708, "mlb_live": 286783, "mlb_paid": 22540, "mlm_live": 31007, "mlm_paid": 2140}, {"date": "2005-02-21", "mla_live": 133220, "mla_paid": 8479, "mlb_live": 285306, "mlb_paid": 25424, "mlm_live": 31450, "mlm_paid": 3421}, {"date": "2005-02-22", "mla_live": 132490, "mla_paid": 7661, "mlb_live": 279772, "mlb_paid": 22338, "mlm_live": 31981, "mlm_paid": 3675}, {"date": "2005-02-23", "mla_live": 133497, "mla_paid": 8360, "mlb_live": 275172, "mlb_paid": 20949, "mlm_live": 31905, "mlm_paid": 2799}, {"date": "2005-02-24", "mla_live": 132161, "mla_paid": 8787, "mlb_live": 272512, "mlb_paid": 23022, "mlm_live": 30673, "mlm_paid": 2999}, {"date": "2005-02-25", "mla_live": 132781, "mla_paid": 7665, "mlb_live": 272671, "mlb_paid": 20395, "mlm_live": 30058, "mlm_paid": 2689}, {"date": "2005-02-26", "mla_live": 131925, "mla_paid": 5637, "mlb_live": 275460, "mlb_paid": 19265, "mlm_live": 29660, "mlm_paid": 2099}, {"date": "2005-02-27", "mla_live": 131928, "mla_paid": 4914, "mlb_live": 275468, "mlb_paid": 25761, "mlm_live": 29650, "mlm_paid": 1668}, {"date": "2005-02-28", "mla_live": 133622, "mla_paid": 9083, "mlb_live": 267685, "mlb_paid": 23934, "mlm_live": 29822, "mlm_paid": 3255}, {"date": "2005-03-01", "mla_live": 134951, "mla_paid": 9110, "mlb_live": 248729, "mlb_paid": 28693, "mlm_live": 29677, "mlm_paid": 2917}, {"date": "2005-03-02", "mla_live": 134133, "mla_paid": 8786, "mlb_live": 253007, "mlb_paid": 25694, "mlm_live": 29607, "mlm_paid": 2730}, {"date": "2005-03-03", "mla_live": 133276, "mla_paid": 8149, "mlb_live": 251764, "mlb_paid": 20941, "mlm_live": 28912, "mlm_paid": 2697}, {"date": "2005-03-04", "mla_live": 132856, "mla_paid": 7517, "mlb_live": 252087, "mlb_paid": 19847, "mlm_live": 52126, "mlm_paid": 25393}, {"date": "2005-03-05", "mla_live": 132335, "mla_paid": 6080, "mlb_live": 250760, "mlb_paid": 16881, "mlm_live": 50977, "mlm_paid": 3495}, {"date": "2005-03-06", "mla_live": 132335, "mla_paid": 5682, "mlb_live": 250759, "mlb_paid": 19736, "mlm_live": 50978, "mlm_paid": 1735}, {"date": "2005-03-07", "mla_live": 134728, "mla_paid": 9079, "mlb_live": 256134, "mlb_paid": 23928, "mlm_live": 50922, "mlm_paid": 3153}, {"date": "2005-03-08", "mla_live": 136366, "mla_paid": 9115, "mlb_live": 259221, "mlb_paid": 24208, "mlm_live": 50961, "mlm_paid": 3460}, {"date": "2005-03-09", "mla_live": 137431, "mla_paid": 8881, "mlb_live": 258148, "mlb_paid": 21185, "mlm_live": 51283, "mlm_paid": 3255}, {"date": "2005-03-10", "mla_live": 136830, "mla_paid": 8169, "mlb_live": 255747, "mlb_paid": 20255, "mlm_live": 48940, "mlm_paid": 2965}, {"date": "2005-03-11", "mla_live": 135800, "mla_paid": 7792, "mlb_live": 233681, "mlb_paid": 23675, "mlm_live": 45762, "mlm_paid": 2631}, {"date": "2005-03-12", "mla_live": 135264, "mla_paid": 6224, "mlb_live": 235891, "mlb_paid": 21916, "mlm_live": 44728, "mlm_paid": 1978}, {"date": "2005-03-13", "mla_live": 135289, "mla_paid": 5652, "mlb_live": 236045, "mlb_paid": 21863, "mlm_live": 44858, "mlm_paid": 1540}, {"date": "2005-03-14", "mla_live": 138248, "mla_paid": 9903, "mlb_live": 238909, "mlb_paid": 26805, "mlm_live": 34939, "mlm_paid": 3516}, {"date": "2005-03-15", "mla_live": 138610, "mla_paid": 9158, "mlb_live": 243199, "mlb_paid": 25917, "mlm_live": 35347, "mlm_paid": 3027}, {"date": "2005-03-16", "mla_live": 138494, "mla_paid": 9870, "mlb_live": 242458, "mlb_paid": 23234, "mlm_live": 35190, "mlm_paid": 3196}, {"date": "2005-03-17", "mla_live": 139924, "mla_paid": 8912, "mlb_live": 243214, "mlb_paid": 23535, "mlm_live": 34770, "mlm_paid": 2920}, {"date": "2005-03-18", "mla_live": 139003, "mla_paid": 7515, "mlb_live": 243737, "mlb_paid": 22771, "mlm_live": 34660, "mlm_paid": 2661}, {"date": "2005-03-19", "mla_live": 139087, "mla_paid": 6665, "mlb_live": 237075, "mlb_paid": 18838, "mlm_live": 33743, "mlm_paid": 1746}, {"date": "2005-03-20", "mla_live": 139085, "mla_paid": 5428, "mlb_live": 237109, "mlb_paid": 17234, "mlm_live": 33747, "mlm_paid": 1457}, {"date": "2005-03-21", "mla_live": 141419, "mla_paid": 9197, "mlb_live": 233704, "mlb_paid": 26592, "mlm_live": 33437, "mlm_paid": 2172}, {"date": "2005-03-22", "mla_live": 140585, "mla_paid": 7468, "mlb_live": 236301, "mlb_paid": 23618, "mlm_live": 33912, "mlm_paid": 3038}, {"date": "2005-03-23", "mla_live": 138831, "mla_paid": 6992, "mlb_live": 233002, "mlb_paid": 21147, "mlm_live": 31879, "mlm_paid": 2175}, {"date": "2005-03-24", "mla_live": 137161, "mla_paid": 6196, "mlb_live": 222547, "mlb_paid": 20153, "mlm_live": 24279, "mlm_paid": 1962}, {"date": "2005-03-25", "mla_live": 137164, "mla_paid": 5141, "mlb_live": 222553, "mlb_paid": 17403, "mlm_live": 24280, "mlm_paid": 1664}, {"date": "2005-03-26", "mla_live": 137161, "mla_paid": 6360, "mlb_live": 222555, "mlb_paid": 15120, "mlm_live": 24280, "mlm_paid": 1821}, {"date": "2005-03-27", "mla_live": 137163, "mla_paid": 5245, "mlb_live": 222554, "mlb_paid": 15690, "mlm_live": 24283, "mlm_paid": 1919}, {"date": "2005-03-28", "mla_live": 139981, "mla_paid": 10776, "mlb_live": 227182, "mlb_paid": 24995, "mlm_live": 25261, "mlm_paid": 3771}, {"date": "2005-03-29", "mla_live": 139052, "mla_paid": 8335, "mlb_live": 225410, "mlb_paid": 21737, "mlm_live": 27076, "mlm_paid": 3518}, {"date": "2005-03-30", "mla_live": 139052, "mla_paid": 9197, "mlb_live": 225410, "mlb_paid": 19909, "mlm_live": 27076, "mlm_paid": 3218}, {"date": "2005-03-31", "mla_live": 139387, "mla_paid": 9401, "mlb_live": 222452, "mlb_paid": 20433, "mlm_live": 26724, "mlm_paid": 3381}, {"date": "2005-04-01", "mla_live": 139682, "mla_paid": 7138, "mlb_live": 222616, "mlb_paid": 18299, "mlm_live": 27108, "mlm_paid": 2775}, {"date": "2005-04-02", "mla_live": 141382, "mla_paid": 6119, "mlb_live": 230344, "mlb_paid": 17173, "mlm_live": 27837, "mlm_paid": 2145}, {"date": "2005-04-03", "mla_live": 141375, "mla_paid": 5171, "mlb_live": 230338, "mlb_paid": 17192, "mlm_live": 27833, "mlm_paid": 1673}, {"date": "2005-04-04", "mla_live": 141363, "mla_paid": 9463, "mlb_live": 230332, "mlb_paid": 22568, "mlm_live": 27805, "mlm_paid": 3311}, {"date": "2005-04-05", "mla_live": 161193, "mla_paid": 30204, "mlb_live": 234668, "mlb_paid": 23378, "mlm_live": 27901, "mlm_paid": 2851}, {"date": "2005-04-06", "mla_live": 160387, "mla_paid": 8243, "mlb_live": 235791, "mlb_paid": 19768, "mlm_live": 27626, "mlm_paid": 2859}, {"date": "2005-04-07", "mla_live": 159650, "mla_paid": 7961, "mlb_live": 235306, "mlb_paid": 20078, "mlm_live": 27637, "mlm_paid": 2780}, {"date": "2005-04-08", "mla_live": 159355, "mla_paid": 8220, "mlb_live": 227964, "mlb_paid": 19149, "mlm_live": 27890, "mlm_paid": 2771}, {"date": "2005-04-09", "mla_live": 157724, "mla_paid": 5325, "mlb_live": 228189, "mlb_paid": 16195, "mlm_live": 26633, "mlm_paid": 1694}, {"date": "2005-04-10", "mla_live": 157724, "mla_paid": 5006, "mlb_live": 228191, "mlb_paid": 17132, "mlm_live": 26633, "mlm_paid": 1960}, {"date": "2005-04-11", "mla_live": 159780, "mla_paid": 9227, "mlb_live": 231309, "mlb_paid": 23785, "mlm_live": 27379, "mlm_paid": 3256}, {"date": "2005-04-12", "mla_live": 158980, "mla_paid": 7793, "mlb_live": 222581, "mlb_paid": 19476, "mlm_live": 27324, "mlm_paid": 2740}, {"date": "2005-04-13", "mla_live": 157941, "mla_paid": 8816, "mlb_live": 236348, "mlb_paid": 27247, "mlm_live": 27694, "mlm_paid": 2595}, {"date": "2005-04-14", "mla_live": 157110, "mla_paid": 7769, "mlb_live": 297894, "mlb_paid": 92270, "mlm_live": 27828, "mlm_paid": 2728}, {"date": "2005-04-15", "mla_live": 155592, "mla_paid": 7481, "mlb_live": 288116, "mlb_paid": 16983, "mlm_live": 28014, "mlm_paid": 2716}, {"date": "2005-04-16", "mla_live": 155320, "mla_paid": 5759, "mlb_live": 285760, "mlb_paid": 13792, "mlm_live": 27689, "mlm_paid": 1884}, {"date": "2005-04-17", "mla_live": 155319, "mla_paid": 5673, "mlb_live": 285757, "mlb_paid": 16105, "mlm_live": 27690, "mlm_paid": 1737}, {"date": "2005-04-18", "mla_live": 157986, "mla_paid": 9695, "mlb_live": 286871, "mlb_paid": 20833, "mlm_live": 27950, "mlm_paid": 3117}, {"date": "2005-04-19", "mla_live": 157399, "mla_paid": 8487, "mlb_live": 287107, "mlb_paid": 19488, "mlm_live": 28507, "mlm_paid": 3043}, {"date": "2005-04-20", "mla_live": 156385, "mla_paid": 8642, "mlb_live": 285729, "mlb_paid": 19320, "mlm_live": 28326, "mlm_paid": 2855}, {"date": "2005-04-21", "mla_live": 156392, "mla_paid": 7949, "mlb_live": 277955, "mlb_paid": 18356, "mlm_live": 28326, "mlm_paid": 2905}, {"date": "2005-04-22", "mla_live": 156261, "mla_paid": 7282, "mlb_live": 279340, "mlb_paid": 19409, "mlm_live": 28106, "mlm_paid": 2566}, {"date": "2005-04-23", "mla_live": 156540, "mla_paid": 5084, "mlb_live": 246279, "mlb_paid": 14559, "mlm_live": 27832, "mlm_paid": 1794}, {"date": "2005-04-24", "mla_live": 156542, "mla_paid": 5891, "mlb_live": 246279, "mlb_paid": 18677, "mlm_live": 27831, "mlm_paid": 1656}, {"date": "2005-04-25", "mla_live": 157888, "mla_paid": 8721, "mlb_live": 251999, "mlb_paid": 24481, "mlm_live": 28535, "mlm_paid": 3271}, {"date": "2005-04-26", "mla_live": 158416, "mla_paid": 8869, "mlb_live": 250556, "mlb_paid": 21409, "mlm_live": 29085, "mlm_paid": 3108}, {"date": "2005-04-27", "mla_live": 157840, "mla_paid": 9043, "mlb_live": 253426, "mlb_paid": 22256, "mlm_live": 28725, "mlm_paid": 2820}, {"date": "2005-04-28", "mla_live": 157475, "mla_paid": 8684, "mlb_live": 253206, "mlb_paid": 20192, "mlm_live": 30908, "mlm_paid": 5121}, {"date": "2005-04-29", "mla_live": 156238, "mla_paid": 7541, "mlb_live": 247260, "mlb_paid": 20666, "mlm_live": 30653, "mlm_paid": 2574}, {"date": "2005-04-30", "mla_live": 154632, "mla_paid": 5528, "mlb_live": 245195, "mlb_paid": 15597, "mlm_live": 30002, "mlm_paid": 1708}, {"date": "2005-05-01", "mla_live": 154633, "mla_paid": 5642, "mlb_live": 245169, "mlb_paid": 16609, "mlm_live": 29994, "mlm_paid": 1854}, {"date": "2005-05-02", "mla_live": 156282, "mla_paid": 9172, "mlb_live": 248972, "mlb_paid": 22382, "mlm_live": 30324, "mlm_paid": 2898}, {"date": "2005-05-03", "mla_live": 156282, "mla_paid": 8855, "mlb_live": 248972, "mlb_paid": 21191, "mlm_live": 30324, "mlm_paid": 2844}, {"date": "2005-05-04", "mla_live": 155764, "mla_paid": 9442, "mlb_live": 235520, "mlb_paid": 22497, "mlm_live": 30221, "mlm_paid": 2723}, {"date": "2005-05-05", "mla_live": 144896, "mla_paid": 10698, "mlb_live": 237698, "mlb_paid": 22592, "mlm_live": 29827, "mlm_paid": 2781}, {"date": "2005-05-06", "mla_live": 145927, "mla_paid": 8733, "mlb_live": 237992, "mlb_paid": 18966, "mlm_live": 29695, "mlm_paid": 2735}, {"date": "2005-05-07", "mla_live": 144277, "mla_paid": 6102, "mlb_live": 231419, "mlb_paid": 14586, "mlm_live": 29706, "mlm_paid": 1905}, {"date": "2005-05-08", "mla_live": 144267, "mla_paid": 6269, "mlb_live": 231495, "mlb_paid": 13072, "mlm_live": 29704, "mlm_paid": 1918}, {"date": "2005-05-09", "mla_live": 147824, "mla_paid": 10252, "mlb_live": 234407, "mlb_paid": 23246, "mlm_live": 30102, "mlm_paid": 2987}, {"date": "2005-05-10", "mla_live": 148162, "mla_paid": 8298, "mlb_live": 236244, "mlb_paid": 22804, "mlm_live": 29862, "mlm_paid": 2387}, {"date": "2005-05-11", "mla_live": 148970, "mla_paid": 9779, "mlb_live": 237366, "mlb_paid": 24783, "mlm_live": 30349, "mlm_paid": 3012}, {"date": "2005-05-12", "mla_live": 149393, "mla_paid": 8394, "mlb_live": 238957, "mlb_paid": 24321, "mlm_live": 30324, "mlm_paid": 3082}, {"date": "2005-05-13", "mla_live": 148995, "mla_paid": 7988, "mlb_live": 239187, "mlb_paid": 20480, "mlm_live": 29723, "mlm_paid": 2539}, {"date": "2005-05-14", "mla_live": 149161, "mla_paid": 5821, "mlb_live": 233839, "mlb_paid": 18091, "mlm_live": 29630, "mlm_paid": 1997}, {"date": "2005-05-15", "mla_live": 149156, "mla_paid": 5729, "mlb_live": 233868, "mlb_paid": 18809, "mlm_live": 29633, "mlm_paid": 1860}, {"date": "2005-05-16", "mla_live": 151212, "mla_paid": 9283, "mlb_live": 239429, "mlb_paid": 24844, "mlm_live": 30108, "mlm_paid": 3056}, {"date": "2005-05-17", "mla_live": 151917, "mla_paid": 8340, "mlb_live": 240313, "mlb_paid": 21598, "mlm_live": 30713, "mlm_paid": 2884}, {"date": "2005-05-18", "mla_live": 151427, "mla_paid": 8929, "mlb_live": 243382, "mlb_paid": 21067, "mlm_live": 30746, "mlm_paid": 3057}, {"date": "2005-05-19", "mla_live": 153043, "mla_paid": 10232, "mlb_live": 242588, "mlb_paid": 20080, "mlm_live": 30409, "mlm_paid": 2565}, {"date": "2005-05-20", "mla_live": 153230, "mla_paid": 8458, "mlb_live": 242843, "mlb_paid": 19319, "mlm_live": 30867, "mlm_paid": 2999}, {"date": "2005-05-21", "mla_live": 151961, "mla_paid": 5314, "mlb_live": 235478, "mlb_paid": 16929, "mlm_live": 30397, "mlm_paid": 1744}, {"date": "2005-05-22", "mla_live": 151957, "mla_paid": 5621, "mlb_live": 235563, "mlb_paid": 18392, "mlm_live": 30397, "mlm_paid": 1523}, {"date": "2005-05-23", "mla_live": 154907, "mla_paid": 9588, "mlb_live": 238402, "mlb_paid": 22568, "mlm_live": 30559, "mlm_paid": 2975}, {"date": "2005-05-24", "mla_live": 153472, "mla_paid": 7363, "mlb_live": 240327, "mlb_paid": 21725, "mlm_live": 57502, "mlm_paid": 28721}, {"date": "2005-05-25", "mla_live": 153162, "mla_paid": 6472, "mlb_live": 239832, "mlb_paid": 20099, "mlm_live": 56990, "mlm_paid": 4753}, {"date": "2005-05-26", "mla_live": 154759, "mla_paid": 9698, "mlb_live": 240524, "mlb_paid": 19980, "mlm_live": 56304, "mlm_paid": 2266}, {"date": "2005-05-27", "mla_live": 152869, "mla_paid": 7488, "mlb_live": 240882, "mlb_paid": 19169, "mlm_live": 54996, "mlm_paid": 2324}, {"date": "2005-05-28", "mla_live": 152666, "mla_paid": 6337, "mlb_live": 240826, "mlb_paid": 15696, "mlm_live": 52971, "mlm_paid": 1818}, {"date": "2005-05-29", "mla_live": 152667, "mla_paid": 6855, "mlb_live": 240807, "mlb_paid": 18141, "mlm_live": 52971, "mlm_paid": 1651}, {"date": "2005-05-30", "mla_live": 156229, "mla_paid": 11521, "mlb_live": 244766, "mlb_paid": 24724, "mlm_live": 53231, "mlm_paid": 3244}, {"date": "2005-05-31", "mla_live": 159352, "mla_paid": 12512, "mlb_live": 244362, "mlb_paid": 28867, "mlm_live": 51952, "mlm_paid": 2945}, {"date": "2005-06-01", "mla_live": 158280, "mla_paid": 7621, "mlb_live": 241724, "mlb_paid": 12707, "mlm_live": 51871, "mlm_paid": 2090}, {"date": "2005-06-02", "mla_live": 157461, "mla_paid": 8375, "mlb_live": 243966, "mlb_paid": 13160, "mlm_live": 51601, "mlm_paid": 2198}, {"date": "2005-06-03", "mla_live": 155883, "mla_paid": 7360, "mlb_live": 242860, "mlb_paid": 11831, "mlm_live": 37424, "mlm_paid": 2344}, {"date": "2005-06-04", "mla_live": 152486, "mla_paid": 5906, "mlb_live": 242449, "mlb_paid": 8988, "mlm_live": 37274, "mlm_paid": 1262}, {"date": "2005-06-05", "mla_live": 152486, "mla_paid": 5395, "mlb_live": 242576, "mlb_paid": 10281, "mlm_live": 37265, "mlm_paid": 1133}, {"date": "2005-06-06", "mla_live": 153807, "mla_paid": 9635, "mlb_live": 244979, "mlb_paid": 13226, "mlm_live": 37941, "mlm_paid": 2007}, {"date": "2005-06-07", "mla_live": 153805, "mla_paid": 8213, "mlb_live": 240859, "mlb_paid": 13078, "mlm_live": 37635, "mlm_paid": 1880}, {"date": "2005-06-08", "mla_live": 152261, "mla_paid": 8767, "mlb_live": 243030, "mlb_paid": 12881, "mlm_live": 37938, "mlm_paid": 1908}, {"date": "2005-06-09", "mla_live": 149957, "mla_paid": 8085, "mlb_live": 243360, "mlb_paid": 12634, "mlm_live": 37579, "mlm_paid": 2014}, {"date": "2005-06-10", "mla_live": 148089, "mla_paid": 8835, "mlb_live": 244385, "mlb_paid": 11110, "mlm_live": 37322, "mlm_paid": 1861}, {"date": "2005-06-11", "mla_live": 144343, "mla_paid": 7026, "mlb_live": 239115, "mlb_paid": 8236, "mlm_live": 36361, "mlm_paid": 1314}, {"date": "2005-06-12", "mla_live": 144339, "mla_paid": 5968, "mlb_live": 239190, "mlb_paid": 9382, "mlm_live": 36373, "mlm_paid": 1130}, {"date": "2005-06-13", "mla_live": 146053, "mla_paid": 10968, "mlb_live": 242896, "mlb_paid": 12512, "mlm_live": 30168, "mlm_paid": 2091}, {"date": "2005-06-14", "mla_live": 145282, "mla_paid": 9082, "mlb_live": 245776, "mlb_paid": 12926, "mlm_live": 31031, "mlm_paid": 2050}, {"date": "2005-06-15", "mla_live": 143806, "mla_paid": 8651, "mlb_live": 247000, "mlb_paid": 12161, "mlm_live": 31468, "mlm_paid": 1973}, {"date": "2005-06-16", "mla_live": 144335, "mla_paid": 11251, "mlb_live": 245488, "mlb_paid": 12077, "mlm_live": 31492, "mlm_paid": 1984}, {"date": "2005-06-17", "mla_live": 142260, "mla_paid": 9076, "mlb_live": 245166, "mlb_paid": 11039, "mlm_live": 31526, "mlm_paid": 1843}, {"date": "2005-06-18", "mla_live": 134951, "mla_paid": 5903, "mlb_live": 243875, "mlb_paid": 8144, "mlm_live": 30746, "mlm_paid": 1253}, {"date": "2005-06-19", "mla_live": 134945, "mla_paid": 5652, "mlb_live": 243849, "mlb_paid": 9972, "mlm_live": 30749, "mlm_paid": 1025}, {"date": "2005-06-20", "mla_live": 134943, "mla_paid": 7378, "mlb_live": 243835, "mlb_paid": 13048, "mlm_live": 30748, "mlm_paid": 1894}, {"date": "2005-06-21", "mla_live": 136118, "mla_paid": 11335, "mlb_live": 246200, "mlb_paid": 13021, "mlm_live": 31521, "mlm_paid": 1836}, {"date": "2005-06-22", "mla_live": 134213, "mla_paid": 9654, "mlb_live": 245060, "mlb_paid": 12449, "mlm_live": 31451, "mlm_paid": 1934}, {"date": "2005-06-23", "mla_live": 132891, "mla_paid": 10001, "mlb_live": 240664, "mlb_paid": 11912, "mlm_live": 30932, "mlm_paid": 1845}, {"date": "2005-06-24", "mla_live": 131352, "mla_paid": 8853, "mlb_live": 240221, "mlb_paid": 10383, "mlm_live": 30640, "mlm_paid": 1755}, {"date": "2005-06-25", "mla_live": 126661, "mla_paid": 7594, "mlb_live": 239059, "mlb_paid": 8164, "mlm_live": 29822, "mlm_paid": 1227}, {"date": "2005-06-26", "mla_live": 126674, "mla_paid": 6153, "mlb_live": 239067, "mlb_paid": 9401, "mlm_live": 29822, "mlm_paid": 1104}, {"date": "2005-06-27", "mla_live": 128241, "mla_paid": 12452, "mlb_live": 241400, "mlb_paid": 13166, "mlm_live": 30365, "mlm_paid": 1925}, {"date": "2005-06-28", "mla_live": 128506, "mla_paid": 11470, "mlb_live": 244526, "mlb_paid": 13344, "mlm_live": 30655, "mlm_paid": 2231}, {"date": "2005-06-29", "mla_live": 126227, "mla_paid": 10672, "mlb_live": 244596, "mlb_paid": 12508, "mlm_live": 31058, "mlm_paid": 1969}, {"date": "2005-06-30", "mla_live": 124221, "mla_paid": 11149, "mlb_live": 243417, "mlb_paid": 12563, "mlm_live": 32156, "mlm_paid": 2036}];
+const FEATURES = [{"feature": "Portada del sitio", "without_pct": 46.3, "with_pct": 79.5, "without_n": 54364, "with_n": 1239}, {"feature": "Portada de categoría", "without_pct": 45.7, "with_pct": 68.7, "without_n": 52431, "with_n": 3169}, {"feature": "Foto", "without_pct": 40.6, "with_pct": 68.1, "without_n": 42578, "with_n": 7079}, {"feature": "Negrita + Foto", "without_pct": 37.4, "with_pct": 72.4, "without_n": 40240, "with_n": 15362}, {"feature": "Mejor posicionamiento", "without_pct": 44.4, "with_pct": 52.4, "without_n": 48616, "with_n": 1041}, {"feature": "Negrita", "without_pct": 47.0, "with_pct": 49.9, "without_n": 54058, "with_n": 1545}];
+const AUCTION_TYPE = [{"type": "Precio Fijo (AFP)", "conv": 42.0, "n": 50215}, {"type": "Subasta (AUC)", "conv": 94.3, "n": 5388}];
+const MONTHLY = [{"month": "Dic '04", "listings": 3273, "conv": 46.7}, {"month": "Ene '05", "listings": 9935, "conv": 44.5}, {"month": "Feb '05", "listings": 5846, "conv": 60.8}, {"month": "Mar '05", "listings": 6052, "conv": 58.4}, {"month": "Abr '05", "listings": 8705, "conv": 48.1}, {"month": "May '05", "listings": 7575, "conv": 43.8}, {"month": "Jun '05", "listings": 8191, "conv": 42.1}, {"month": "Jul '05", "listings": 6010, "conv": 36.1}];
+
+</script>
+<script>
+Chart.defaults.color = '#3E5E8C';
+Chart.defaults.font.family = "ui-sans-serif, system-ui, sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.borderColor = '#CFE0F7';
+const COLORS = { mla:'#2F6FBF', mlb:'#2E9E76', mlm:'#E8952E', gold:'#FFCB3D', danger:'#E2604F', text:'#173A66', navy:'#1F4C8C' };
+function fmt(n){ return new Intl.NumberFormat('es-AR').format(Math.round(n)); }
+
+// ---- KPIs ----
+const first = LISTINGS[0], last = LISTINGS[LISTINGS.length-1];
+const mlmChange = ((last.mlm_live - first.mlm_live) / first.mlm_live * 100);
+const kpis = [
+  { label:'Publicaciones analizadas', value:'55.603', foot:'registros de subastas / ventas', accent:'var(--gold)' },
+  { label:'Conversión general', value:'47.0%', foot:'de publicaciones terminan vendidas', accent:'var(--gold)' },
+  { label:'Conversión Subasta vs. Precio fijo', value:'94.3% / 42.0%', foot:'AUC vs. AFP', accent:'var(--mlb)' },
+  { label:'Caída Live Listings México', value: mlmChange.toFixed(0)+'%', foot:'nov.\'04 → jun.\'05, tras tarifas', accent:'var(--mlm)' },
+];
+document.getElementById('kpiRow').innerHTML = kpis.map(k => `
+  <div class="kpi" style="--accent:${k.accent}">
+    <div class="label">${k.label}</div>
+    <div class="value">${k.value}</div>
+    <div class="foot">${k.foot}</div>
+  </div>`).join('');
+
+// ---- Live listings chart: interactivo (país + rango de fechas) ----
+const labels = LISTINGS.map(d => d.date);
+function radiusArray(len, spikeIdx, r){
+  const arr = new Array(len).fill(0);
+  spikeIdx.forEach(i => arr[i] = r);
+  return arr;
+}
+const SPIKES = { mla:[74,155], mlb:[110,164], mlm:[28,56,63,123,204] };
+let filterState = { mla:true, mlb:true, mlm:true, from:0, to:LISTINGS.length-1 };
+
+function fmtDate(iso){
+  const [y,m,d] = iso.split('-');
+  const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return `${d} ${meses[parseInt(m)-1]} ${y}`;
+}
+function buildLiveDatasets(){
+  const ds = [];
+  if (filterState.mla) ds.push({ label:'MLA', data:LISTINGS.map(d=>d.mla_live), borderColor:COLORS.mla, backgroundColor:COLORS.mla, borderWidth:2, pointRadius:radiusArray(LISTINGS.length,SPIKES.mla,5), pointHoverRadius:6, tension:0.15 });
+  if (filterState.mlb) ds.push({ label:'MLB', data:LISTINGS.map(d=>d.mlb_live), borderColor:COLORS.mlb, backgroundColor:COLORS.mlb, borderWidth:2, pointRadius:radiusArray(LISTINGS.length,SPIKES.mlb,5), pointHoverRadius:6, tension:0.15 });
+  if (filterState.mlm) ds.push({ label:'MLM', data:LISTINGS.map(d=>d.mlm_live), borderColor:COLORS.mlm, backgroundColor:COLORS.mlm, borderWidth:2.5, pointRadius:radiusArray(LISTINGS.length,SPIKES.mlm,5), pointHoverRadius:6, tension:0.15 });
+  return ds;
+}
+
+const liveChart = new Chart(document.getElementById('liveChart'), {
+  type:'line',
+  data:{ labels, datasets: buildLiveDatasets() },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    interaction:{mode:'index', intersect:false},
+    plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'#FFFFFF', titleColor:'#173A66', bodyColor:'#3E5E8C', borderColor:'#CFE0F7', borderWidth:1, padding:10,
+      callbacks:{ label: ctx => `${ctx.dataset.label}: ${fmt(ctx.parsed.y)} publicaciones` } } },
+    scales:{
+      x:{ min: filterState.from, max: filterState.to, ticks:{ maxTicksLimit:8, color:'#6E86AC' }, grid:{ display:false } },
+      y:{ ticks:{ callback:v=>fmt(v), color:'#6E86AC' }, grid:{ color:'#E8F0FC' } }
+    }
+  }
+});
+
+function updateLiveChart(){
+  const anyActive = filterState.mla || filterState.mlb || filterState.mlm;
+  document.getElementById('liveEmpty').style.display = anyActive ? 'none' : 'block';
+  document.getElementById('liveChart').style.display = anyActive ? 'block' : 'none';
+  liveChart.data.datasets = buildLiveDatasets();
+  liveChart.options.scales.x.min = filterState.from;
+  liveChart.options.scales.x.max = filterState.to;
+  liveChart.update();
+}
+
+['mla','mlb','mlm'].forEach(c => {
+  document.getElementById('chip'+c.toUpperCase()).addEventListener('click', () => {
+    filterState[c] = !filterState[c];
+    document.getElementById('chip'+c.toUpperCase()).classList.toggle('off', !filterState[c]);
+    updateLiveChart();
+  });
+});
+const rangeFrom = document.getElementById('rangeFrom');
+const rangeTo = document.getElementById('rangeTo');
+function updateRange(){
+  let f = parseInt(rangeFrom.value), t = parseInt(rangeTo.value);
+  if (f > t){ [f,t] = [t,f]; }
+  filterState.from = f; filterState.to = t;
+  document.getElementById('dateFromLabel').textContent = fmtDate(labels[f]);
+  document.getElementById('dateToLabel').textContent = fmtDate(labels[t]);
+  updateLiveChart();
+}
+rangeFrom.addEventListener('input', updateRange);
+rangeTo.addEventListener('input', updateRange);
+document.getElementById('resetBtn').addEventListener('click', () => {
+  filterState = { mla:true, mlb:true, mlm:true, from:0, to:LISTINGS.length-1 };
+  ['mla','mlb','mlm'].forEach(c => document.getElementById('chip'+c.toUpperCase()).classList.remove('off'));
+  rangeFrom.value = 0; rangeTo.value = LISTINGS.length-1;
+  document.getElementById('dateFromLabel').textContent = fmtDate(labels[0]);
+  document.getElementById('dateToLabel').textContent = fmtDate(labels[labels.length-1]);
+  updateLiveChart();
+});
+
+// ---- Feature uplift chart ----
+new Chart(document.getElementById('featChart'), {
+  type:'bar',
+  data:{
+    labels: FEATURES.map(f=>f.feature),
+    datasets:[
+      { label:'Sin la característica', data: FEATURES.map(f=>f.without_pct), backgroundColor:'#CFE0F7', borderRadius:5, maxBarThickness:16 },
+      { label:'Con la característica', data: FEATURES.map(f=>f.with_pct), backgroundColor:COLORS.navy, borderRadius:5, maxBarThickness:16 },
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false, indexAxis:'y',
+    plugins:{ legend:{ position:'top', align:'end', labels:{ boxWidth:9, boxHeight:9, usePointStyle:true, color:'#3E5E8C' } },
+      tooltip:{ backgroundColor:'#FFFFFF', titleColor:'#173A66', bodyColor:'#3E5E8C', borderColor:'#CFE0F7', borderWidth:1, padding:10, callbacks:{ label: ctx => `${ctx.dataset.label}: ${ctx.parsed.x}%` } } },
+    scales:{
+      x:{ max:100, ticks:{ callback:v=>v+'%', color:'#6E86AC' }, grid:{ color:'#E8F0FC' } },
+      y:{ grid:{ display:false }, ticks:{ color:'#173A66', font:{size:11} } }
+    }
+  }
+});
+
+// ---- Feature table (sortable) ----
+let sortState = { key:'diff', dir:-1 };
+function renderFeatTable(){
+  const rows = FEATURES.map(f => ({...f, diff: +(f.with_pct - f.without_pct).toFixed(1)}));
+  rows.sort((a,b) => {
+    const k = sortState.key;
+    if (typeof a[k] === 'string') return sortState.dir * a[k].localeCompare(b[k]);
+    return sortState.dir * (a[k]-b[k]);
+  });
+  document.getElementById('featTable').innerHTML = rows.map(f => `
+    <tr>
+      <td class="strong">${f.feature}</td>
+      <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:${f.without_pct}%; background:#CFE0F7;"></div></div><span>${f.without_pct}%</span></div></td>
+      <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:${f.with_pct}%; background:var(--navy);"></div></div><span>${f.with_pct}%</span></div></td>
+      <td class="strong" style="color:${f.diff>0?'#2E9E76':'#E2604F'}">${f.diff>0?'+':''}${f.diff} pp</td>
+    </tr>`).join('');
+  document.querySelectorAll('th[data-sort]').forEach(th => {
+    const arrowEl = th.querySelector('.arrow');
+    arrowEl.textContent = sortState.key === th.dataset.sort ? (sortState.dir === 1 ? '↑' : '↓') : '';
+  });
+}
+document.querySelectorAll('th[data-sort]').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.dataset.sort;
+    if (sortState.key === key){ sortState.dir *= -1; } else { sortState.key = key; sortState.dir = 1; }
+    renderFeatTable();
+  });
+});
+renderFeatTable();
+
+// ---- Auction type chart ----
+new Chart(document.getElementById('auctionChart'), {
+  type:'bar',
+  data:{
+    labels: AUCTION_TYPE.map(a=>a.type),
+    datasets:[{ data: AUCTION_TYPE.map(a=>a.conv), backgroundColor:[COLORS.mla, COLORS.gold], borderRadius:6, maxBarThickness:80 }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false, indexAxis:'y',
+    plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'#FFFFFF', titleColor:'#173A66', bodyColor:'#3E5E8C', borderColor:'#CFE0F7', borderWidth:1, padding:10,
+      callbacks:{ label: ctx => `${ctx.parsed.x}% conversión (n=${fmt(AUCTION_TYPE[ctx.dataIndex].n)})` } } },
+    scales:{
+      x:{ max:100, ticks:{ callback:v=>v+'%', color:'#6E86AC' }, grid:{ color:'#E8F0FC' } },
+      y:{ grid:{ display:false }, ticks:{ color:'#173A66' } }
+    }
+  }
+});
+
+// ---- Carrusel horizontal ----
+const deck = document.getElementById('deck');
+const slides = Array.from(document.querySelectorAll('section.slide'));
+const total = slides.length;
+let current = 0;
+let animating = false;
+
+const nav = document.getElementById('navdots');
+slides.forEach((s,i) => {
+  const a = document.createElement('a');
+  a.href = 'javascript:void(0)';
+  a.addEventListener('click', () => goTo(i));
+  nav.appendChild(a);
+});
+const dots = Array.from(nav.children);
+
+const btnPrev = document.getElementById('btnPrev');
+const btnNext = document.getElementById('btnNext');
+const progressbar = document.getElementById('progressbar');
+const slidecount = document.getElementById('slidecount');
+
+function render(){
+  deck.style.transform = `translateX(-${current * 100}vw)`;
+  dots.forEach((d,i)=> d.classList.toggle('active', i===current));
+  btnPrev.classList.toggle('disabled', current === 0);
+  btnNext.classList.toggle('disabled', current === total-1);
+  progressbar.style.width = ((current+1)/total*100) + '%';
+  slidecount.textContent = (current+1) + ' / ' + total;
+}
+
+function goTo(i){
+  if (animating) return;
+  i = Math.max(0, Math.min(total-1, i));
+  if (i === current) return;
+  animating = true;
+  current = i;
+  render();
+  setTimeout(()=> animating = false, 560);
+}
+function next(){ goTo(current+1); }
+function prev(){ goTo(current-1); }
+btnNext.addEventListener('click', next);
+btnPrev.addEventListener('click', prev);
+
+document.addEventListener('keydown', (e) => {
+  if (['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){ e.preventDefault(); next(); }
+  if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
+  if (e.key === 'Home'){ e.preventDefault(); goTo(0); }
+  if (e.key === 'End'){ e.preventDefault(); goTo(total-1); }
+});
+
+// swipe (touch) support
+let touchStartX = null;
+deck.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, {passive:true});
+deck.addEventListener('touchend', (e) => {
+  if (touchStartX === null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 50){ dx < 0 ? next() : prev(); }
+  touchStartX = null;
+}, {passive:true});
+
+// wheel (trackpad horizontal / vertical) - throttled
+let wheelLock = false;
+document.addEventListener('wheel', (e) => {
+  if (wheelLock) return;
+  const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+  if (Math.abs(delta) < 30) return;
+  wheelLock = true;
+  delta > 0 ? next() : prev();
+  setTimeout(()=> wheelLock = false, 650);
+}, {passive:true});
+
+// ---- Auto-fit: escala cada slide para que entre completo en pantalla (proyección) ----
+function fitSlide(section){
+  const inner = section.querySelector('.slide-inner');
+  if (!inner) return;
+  inner.style.transform = 'none';
+  const cs = getComputedStyle(section);
+  const availH = section.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const naturalH = inner.scrollHeight;
+  if (naturalH > availH && availH > 0){
+    const scale = Math.max(0.5, availH / naturalH);
+    inner.style.transform = `scale(${scale})`;
+  }
+}
+function fitAllSlides(){ slides.forEach(fitSlide); }
+window.addEventListener('resize', fitAllSlides);
+window.addEventListener('load', fitAllSlides);
+setTimeout(fitAllSlides, 50);
+setTimeout(fitAllSlides, 300);
+
+render();
+fitAllSlides();
+</script>
+</body>
+</html>
